@@ -6,5 +6,11 @@ package com.global.training.polygon.utils;
 public class ApiRetrofit {
 
 
+	public void saveUsersToDataBase(){
+
+	}
+
+
+
 
 }
