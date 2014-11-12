@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -41,7 +43,8 @@ public class MainActivity extends Activity {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						String url = "https://portal-ua.globallogic.com";
+						String url =  "https://portal-ua.globallogic.com/officetime/json/employees.php";
+//						String url = "https://portal-ua.globallogic.com";
 //						String url = "https://habrahabr.ru/";
 //						 String url1 =  new Uri.Builder()
 //								.scheme("https")
@@ -63,6 +66,8 @@ public class MainActivity extends Activity {
 	public  String GET(String url) {
 		InputStream inputStream = null;
 		String result = "";
+		List<String> list = null;
+		list = new ArrayList<String>();
 		try {
 
 			HttpClient httpclient = new DefaultHttpClient();
@@ -72,15 +77,14 @@ public class MainActivity extends Activity {
 			HttpGet httpGet = new HttpGet(url);
 
 //			httpGet.setURI(url);
-			httpGet.addHeader(BasicScheme
-					.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[pi989898pi]!"),"UTF-8", false));
+			httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[pi989898pi]!"), "UTF-8", false));
 //			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("eugenii.samarskyi", "[pi989898pi]!");
 //			BasicScheme scheme = new BasicScheme();
 //			Header authorizationHeader = scheme.authenticate(credentials, httpGet);
 //			httpGet.addHeader(authorizationHeader);
 
 			HttpResponse httpResponse = httpclient.execute(httpGet);
-
+			Log.d(MainActivity.class.getSimpleName(),"Response code : " + httpResponse.getStatusLine());
 			inputStream = httpResponse.getEntity().getContent();
 
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
@@ -88,6 +92,7 @@ public class MainActivity extends Activity {
 			String line = "";
 			while ((line = bufferedReader.readLine()) != null){
 				result += line;
+				list.add(line);
 				Log.d(MainActivity.class.getSimpleName(),line );
 			}
 
@@ -96,7 +101,7 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		Log.d(MainActivity.class.getSimpleName(),"Total user count: " + list.size() );
 		return result;
 	}
 
