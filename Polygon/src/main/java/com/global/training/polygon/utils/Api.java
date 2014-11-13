@@ -50,7 +50,6 @@ public class Api {
         };
 
         String userInfo = PreferencesUtils.getLastUser();
-        Log.d(TAG, "Last User: " + userInfo);
         String[] infoSplit = userInfo.split(" "); // 0 - first_name, 1 - last_name, 2 - password
 
         ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0] + "." + infoSplit[1], infoSplit[2]);

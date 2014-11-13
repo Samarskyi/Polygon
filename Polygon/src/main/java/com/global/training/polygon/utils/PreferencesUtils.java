@@ -2,7 +2,6 @@ package com.global.training.polygon.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.global.training.polygon.App;
 import com.global.training.polygon.model.User;
@@ -20,7 +19,6 @@ public class PreferencesUtils {
 
     public static void saveLastUser(User user, String pass){
 
-        Log.d(TAG, "Save user to pref:" + user.getFirst_name() + ",  " + user.getLast_name());
         String loginPassForDecrypt = user.getFirst_name()+ " "+ user.getLast_name()+ " "+ pass;
         try {
             mEditor.putString("lastUser",EncryptionUtils.encrypt("123456789", loginPassForDecrypt) );
