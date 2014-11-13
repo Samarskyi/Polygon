@@ -9,8 +9,8 @@ import retrofit.RequestInterceptor;
  */
 public class ApiRequestInterceptor implements RequestInterceptor {
 
-    String login;
-    String pass;
+    private String login;
+    private String pass;
 
     public ApiRequestInterceptor(String login, String pass) {
         this.login = login;
@@ -19,7 +19,7 @@ public class ApiRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void intercept(RequestFacade request) {
-        if(login != null && pass != null    ){
+        if(login != null && pass != null){
             final String authorizationValue = encodeCredentialsForBasicAuthorization();
             request.addHeader("Authorization", authorizationValue);
         }

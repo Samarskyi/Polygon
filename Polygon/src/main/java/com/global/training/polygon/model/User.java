@@ -10,6 +10,11 @@ public class User {
     private String first_name;
     private String last_name;
 
+    public User(String fName,String lName){
+        first_name = fName;
+        last_name = lName;
+    }
+
     public int getUid() {
         return uid;
     }
