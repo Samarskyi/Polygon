@@ -22,7 +22,7 @@ import retrofit.client.Response;
 import retrofit.http.GET;
 
 /**
- * Created by eugenii.samarskyi on 12.11.2014.
+ * @author  eugenii.samarskyi on 12.11.2014.
  */
 public class Api {
 

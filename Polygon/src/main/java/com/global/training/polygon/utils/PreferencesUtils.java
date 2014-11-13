@@ -8,7 +8,7 @@ import com.global.training.polygon.App;
 import com.global.training.polygon.model.User;
 
 /**
- * Created by eugenii.samarskyi on 12.11.2014.
+ * @author  eugenii.samarskyi on 12.11.2014.
  */
 public class PreferencesUtils {
 
@@ -18,10 +18,9 @@ public class PreferencesUtils {
     private static SharedPreferences mSharedPreferences = App.self().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     private static SharedPreferences.Editor mEditor = mSharedPreferences.edit();
 
-    public static void saveLastUser(User user, String pass){
+    public static void saveLastUser(String login, String pass){
 
-        Log.d(TAG, "Save user to pref:" + user.getFirst_name() + ",  " + user.getLast_name());
-        String loginPassForDecrypt = user.getFirst_name()+ " "+ user.getLast_name()+ " "+ pass;
+        String loginPassForDecrypt = login + " " + pass;
         try {
             mEditor.putString("lastUser",EncryptionUtils.encrypt("123456789", loginPassForDecrypt) );
         } catch (Exception e) {
