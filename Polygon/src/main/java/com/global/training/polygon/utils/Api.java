@@ -62,6 +62,7 @@ public class Api {
         mEmployees.employeeList(callback);
     }
 
+
     public static void auth(final String login, final String pass, final AuthCallback authCallback) {
 
         new Thread(new Runnable() {

@@ -13,12 +13,13 @@ import com.global.training.polygon.model.User;
 public class PreferencesUtils {
 
     private static final String PREF_NAME = PreferencesUtils.class.getName();
+    private static final String TAG = SharedPreferences.class.getSimpleName();
 
     private static SharedPreferences mSharedPreferences = App.self().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     private static SharedPreferences.Editor mEditor = mSharedPreferences.edit();
 
     public static void saveLastUser(User user, String pass){
-        Log.d(SharedPreferences.class.getSimpleName(), "Save user to pref:" + user.getFirst_name() + ",  " + user.getLast_name());
+        Log.d(TAG, "Save user to pref:" + user.getFirst_name() + ",  " + user.getLast_name());
         mEditor.putString("lastUser", user.getFirst_name()+ " "+ user.getLast_name()+ " "+ pass);
         mEditor.commit();
     }

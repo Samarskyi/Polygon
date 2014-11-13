@@ -34,7 +34,11 @@ public class MainTestActivity extends Activity implements Api.AuthCallback, Api.
             @Override
             public void onClick(View v) {
 //                Api.auth(fName+ "." + lName, pass, MainTestActivity.this);
-                  Api.getUsers(MainTestActivity.this);
+//                  Api.getUsers(MainTestActivity.this);
+
+                Log.d(TAG, "Before " +  fName);
+//                fName =
+
             }
         });
     }
@@ -54,7 +58,7 @@ public class MainTestActivity extends Activity implements Api.AuthCallback, Api.
 
     @Override
     public void getUserList(List<User> list) {
-        Log.d(MainTestActivity.class.getSimpleName(), "From Callback GetUserList " + list.size());
+        Log.d(TAG, "From Callback GetUserList " + list.size());
     }
 
 }
