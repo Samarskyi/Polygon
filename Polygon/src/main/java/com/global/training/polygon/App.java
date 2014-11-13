@@ -3,7 +3,7 @@ package com.global.training.polygon;
 import android.app.Application;
 
 /**
- * Created by eugenii.samarskyi on 12.11.2014.
+ * @author  eugenii.samarskyi on 12.11.2014.
  */
 public class App extends Application {
 

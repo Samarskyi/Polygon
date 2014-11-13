@@ -8,7 +8,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by eugenii.samarskyi on 13.11.2014.
+ * @author  eugenii.samarskyi on 13.11.2014.
  */
 public class EncryptionUtils {
 

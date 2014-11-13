@@ -5,7 +5,7 @@ import android.util.Base64;
 import retrofit.RequestInterceptor;
 
 /**
- * Created by eugenii.samarskyi on 13.11.2014.
+ * @author  eugenii.samarskyi on 13.11.2014.
  */
 public class ApiRequestInterceptor implements RequestInterceptor {
 
