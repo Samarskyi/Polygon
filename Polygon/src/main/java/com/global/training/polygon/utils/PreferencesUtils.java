@@ -19,14 +19,26 @@ public class PreferencesUtils {
     private static SharedPreferences.Editor mEditor = mSharedPreferences.edit();
 
     public static void saveLastUser(User user, String pass){
+
         Log.d(TAG, "Save user to pref:" + user.getFirst_name() + ",  " + user.getLast_name());
-        mEditor.putString("lastUser", user.getFirst_name()+ " "+ user.getLast_name()+ " "+ pass);
+        String loginPassForDecrypt = user.getFirst_name()+ " "+ user.getLast_name()+ " "+ pass;
+        try {
+            mEditor.putString("lastUser",EncryptionUtils.encrypt("123456789", loginPassForDecrypt) );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mEditor.commit();
     }
 
     public static String getLastUser(){
+
        String lastUser = mSharedPreferences.getString("lastUser", null);
-       return lastUser;
+        try {
+            lastUser = EncryptionUtils.decrypt("123456789", lastUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lastUser;
     }
 
 }

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GitMaster.iml" filepath="$PROJECT_DIR$/GitMaster.iml" />
       <module fileurl="file://$PROJECT_DIR$/Polygon.iml" filepath="$PROJECT_DIR$/Polygon.iml" />
       <module fileurl="file://$PROJECT_DIR$/Polygon/Polygon-Polygon.iml" filepath="$PROJECT_DIR$/Polygon/Polygon-Polygon.iml" />
     </modules>
