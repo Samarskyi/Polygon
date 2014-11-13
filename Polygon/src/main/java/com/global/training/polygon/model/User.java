@@ -5,48 +5,40 @@ package com.global.training.polygon.model;
  */
 public class User {
 
+    private int uid;
+    private String zone;
+    private String first_name;
+    private String last_name;
 
-	int id;
-	String zone;
-	String first_name;
-	String lastName;
+    public int getUid() {
+        return uid;
+    }
 
-	public User(int id, String zone, String first_name, String lastName) {
-		this.id = id;
-		this.zone = zone;
-		this.first_name = first_name;
-		this.lastName = lastName;
-	}
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public String getZone() {
+        return zone;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setZone(String zone) {
+        this.zone = zone;
+    }
 
-	public String getZone() {
-		return zone;
-	}
+    public String getFirst_name() {
+        return first_name;
+    }
 
-	public void setZone(String zone) {
-		this.zone = zone;
-	}
+    public void setFirst_name(String first_name) {
+        this.first_name = first_name;
+    }
 
-	public String getFirst_name() {
-		return first_name;
-	}
+    public String getLast_name() {
+        return last_name;
+    }
 
-	public void setFirst_name(String first_name) {
-		this.first_name = first_name;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
+    }
 }

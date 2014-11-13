@@ -1,108 +1,91 @@
 package com.global.training.polygon;
 
 import android.app.Activity;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.DefaultHttpClient;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.ArrayList;
+import com.global.training.polygon.model.User;
+import com.global.training.polygon.utils.Api;
+import com.global.training.polygon.utils.ApiRequestInterceptor;
+
 import java.util.List;
 
-public class MainActivity extends Activity {
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.http.GET;
 
-	Button button;
+public class MainActivity extends Activity implements Api.InternetCallback {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+    private static final String TAG = MainActivity.class.getSimpleName();
 
+    //    private static final String URL_EMPLOYEES = "https://portal-ua.globallogic.com/officetime/json/employees.php";
+    private static final String URL_EMPLOYEES = "https://portal-ua.globallogic.com";
 
-		button = (Button) findViewById(R.id.butt);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						String url =  "https://portal-ua.globallogic.com/officetime/json/employees.php";
-//						String url = "https://portal-ua.globallogic.com";
-//						String url = "https://habrahabr.ru/";
-//						 String url1 =  new Uri.Builder()
-//								.scheme("https")
-//								.authority("eugenii.samarskyi.com")
-//								.path("someservlet")
-//								.appendQueryParameter("param1", "")
-//								.appendQueryParameter("param2", "")
-//								.build().toString();
-						String response = GET(url);
-						Log.d(MainActivity.class.getSimpleName(),response);
+    interface Employees {
+        @GET("/officetime/json/employees.php")
+        void employeeList(Callback<List<User>> cb);
+    }
 
-					}
-				}).start();
-			}
-		});
+    Button button;
+    Employees mEmployees;
+    Callback<List<User>> callback;
+    List<User> users1;
 
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-	public  String GET(String url) {
-		InputStream inputStream = null;
-		String result = "";
-		List<String> list = null;
-		list = new ArrayList<String>();
-		try {
+        Api.addInternetCallback(this);
 
-			HttpClient httpclient = new DefaultHttpClient();
+        callback = new Callback<List<User>>() {
 
+            @Override
+            public void success( List<User> users, Response response) {
+                users1 = users;
+                Log.d(TAG, "User count : " + users1.size());
+            }
 
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG, "Fail get users: "+ error.getMessage());
+                error.printStackTrace();
+            }
+        };
 
-			HttpGet httpGet = new HttpGet(url);
+        button = (Button) findViewById(R.id.butt);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Api.auth(null, null);
+//                DataBaseManager dataBaseManager = DataBaseManager.getInstance();
+//                dataBaseManager.open();
 
-//			httpGet.setURI(url);
-			httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[pi989898pi]!"), "UTF-8", false));
-//			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("eugenii.samarskyi", "[pi989898pi]!");
-//			BasicScheme scheme = new BasicScheme();
-//			Header authorizationHeader = scheme.authenticate(credentials, httpGet);
-//			httpGet.addHeader(authorizationHeader);
+                ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor("eugenii.samarskyi","[pi989898pi]!");
+                RestAdapter restAdapter = new RestAdapter.
+                                            Builder().setEndpoint(URL_EMPLOYEES).
+                                            setRequestInterceptor(requestInterceptor).build();
 
-			HttpResponse httpResponse = httpclient.execute(httpGet);
-			Log.d(MainActivity.class.getSimpleName(),"Response code : " + httpResponse.getStatusLine());
-			inputStream = httpResponse.getEntity().getContent();
+                mEmployees = restAdapter.create(Employees.class);
+                mEmployees.employeeList(callback);
 
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
+            }
+        });
 
-			String line = "";
-			while ((line = bufferedReader.readLine()) != null){
-				result += line;
-				list.add(line);
-				Log.d(MainActivity.class.getSimpleName(),line );
-			}
+    }
 
-			inputStream.close();
+    @Override
+    protected void onDestroy() {
+        Api.removeInternetCallback(this);
+        super.onDestroy();
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		Log.d(MainActivity.class.getSimpleName(),"Total user count: " + list.size() );
-		return result;
-	}
-
+    @Override
+    public void isAuthentication(boolean what) {
+        Log.d(MainActivity.class.getSimpleName(), "From Callback Response " + what);
+    }
 }
