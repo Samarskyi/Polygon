@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * @author yurii.ostrovskyi
  */
-public class UserChooseActivity extends Activity implements Api.EmployeesCallback{
+public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener, Api.EmployeesCallback{
 
 	private List<User> mUserList;
 	private List<User> mUserListOriginal;
@@ -32,11 +33,12 @@ public class UserChooseActivity extends Activity implements Api.EmployeesCallbac
 
 		Api.getUsers(this);
 
-		AutoCompleteTextView textView = (AutoCompleteTextView)
+		AutoCompleteTextView autoTextView = (AutoCompleteTextView)
 				findViewById(R.id.user_search_field);
-		textView.setAdapter(new Adapter());
-		textView.setThreshold(1);
-		textView.setOnEditorActionListener(new ImeActionListener());
+		autoTextView.setAdapter(new Adapter());
+		autoTextView.setThreshold(1);
+		autoTextView.setOnEditorActionListener(new ImeActionListener());
+		autoTextView.setOnItemClickListener(this);
 
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
@@ -46,6 +48,12 @@ public class UserChooseActivity extends Activity implements Api.EmployeesCallbac
 	public void getUserList(List<User> list) {
 		mUserList = list;
 		mUserListOriginal = new ArrayList<User>(mUserList);
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		Log.d("MyLog", "ID is " +mUserList.get(position).getUid());
+
 	}
 
 	private class Adapter extends BaseAdapter implements Filterable{
