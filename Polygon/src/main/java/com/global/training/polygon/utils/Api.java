@@ -3,6 +3,7 @@ package com.global.training.polygon.utils;
 import android.util.Log;
 
 import com.global.training.polygon.model.User;
+import com.mobprofs.retrofit.converters.SimpleXmlConverter;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -26,6 +27,7 @@ import retrofit.http.GET;
  */
 public class Api {
 
+    private static final String URL_GLOBAL_LOGIC = "https://portal-ua.globallogic.com";
     private static final String URL_EMPLOYEES = "https://portal-ua.globallogic.com/officetime/json/employees.php";
     private static final String TAG = Api.class.getSimpleName();
 
@@ -92,12 +94,48 @@ public class Api {
         }).start();
     }
 
+    public static void timeWork(long from, long till, int userId, final OfficeTime officeTime){
+
+        callback = new Callback<List<User>>() {
+
+            @Override
+            public void success(List<User> users, Response response) {
+                officeTime.timeList("");
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG, "Fail get users: " + error.getMessage());
+                error.printStackTrace();
+            }
+        };
+
+        String userInfo = PreferencesUtils.getLastUser();
+        String[] infoSplit = userInfo.split(" "); // 0 - first_name, 1 - last_name, 2 - password
+
+        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0] + "." + infoSplit[1], infoSplit[2]);
+        RestAdapter restAdapter = new RestAdapter.
+                Builder().setEndpoint(URL_EMPLOYEES).
+                setRequestInterceptor(requestInterceptor)
+                .setConverter(new SimpleXmlConverter()).
+                build();
+
+        mEmployees = restAdapter.create(Employees.class);
+        mEmployees.employeeList(callback);
+    }
+
+
     public interface AuthCallback {
         public void isAuthentication(boolean what);
     }
 
     public interface EmployeesCallback {
         public void getUserList(List<User> list);
+    }
+
+    interface OfficeTime{
+        @GET("officetime/legacy/index_new.php")
+        void timeList(String time);
     }
 
     interface Employees {

@@ -24,6 +24,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Api.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_main);
 
+        autoLoginLastUser();
 		Button loginButton = (Button) findViewById(R.id.login_btn);
 		mLoginField = (EditText) findViewById(R.id.login);
 		mPasswordField = (EditText) findViewById(R.id.password);
