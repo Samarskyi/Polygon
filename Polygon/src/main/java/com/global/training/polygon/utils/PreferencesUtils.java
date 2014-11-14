@@ -22,7 +22,7 @@ public class PreferencesUtils {
 
         String loginPassForDecrypt = login + " " + pass;
         try {
-            mEditor.putString("lastUser",EncryptionUtils.encrypt("123456789", loginPassForDecrypt) );
+            mEditor.putString("lastUser", loginPassForDecrypt);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,13 +31,12 @@ public class PreferencesUtils {
 
     public static String getLastUser(){
 
-       String lastUser = mSharedPreferences.getString("lastUser", null);
-        try {
-            lastUser = EncryptionUtils.decrypt("123456789", lastUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return lastUser;
+//        try {
+//            lastUser = EncryptionUtils.decrypt("123456789", lastUser);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        return mSharedPreferences.getString("lastUser", null);
     }
 
 }

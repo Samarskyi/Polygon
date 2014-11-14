@@ -53,7 +53,7 @@ public class Api {
         Log.d(TAG, "Last User: " + userInfo);
         String[] infoSplit = userInfo.split(" "); // 0 - first_name, 1 - last_name, 2 - password
 
-        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0] + "." + infoSplit[1], infoSplit[2]);
+        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
         RestAdapter restAdapter = new RestAdapter.
                 Builder().setEndpoint(URL_EMPLOYEES).
                 setRequestInterceptor(requestInterceptor).build();

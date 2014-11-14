@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import com.global.training.polygon.R;
 import com.global.training.polygon.model.User;
+import com.global.training.polygon.utils.Api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * @author yurii.ostrovskyi
  */
-public class UserChooseActivity extends Activity {
+public class UserChooseActivity extends Activity implements Api.EmployeesCallback{
 
 	private List<User> mUserList;
 	private List<User> mUserListOriginal;
@@ -29,18 +30,7 @@ public class UserChooseActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_user_choose);
 
-		mUserList = new ArrayList<User>();
-		mUserList.add(new User("John", "McLane"));
-		mUserList.add(new User("Booby", "Dilan"));
-		mUserList.add(new User("Elton", "John"));
-		mUserList.add(new User("William", "Walles"));
-		mUserList.add(new User("Holly", "McLane"));
-		mUserList.add(new User("Sara", "McLane"));
-		mUserList.add(new User("Sara", "Connor"));
-		mUserList.add(new User("John", "Tacker"));
-		mUserList.add(new User("Jason", "Bourne"));
-		mUserList.add(new User("Marry", "Lewis"));
-		mUserListOriginal = new ArrayList<User>(mUserList);
+		Api.getUsers(this);
 
 		AutoCompleteTextView textView = (AutoCompleteTextView)
 				findViewById(R.id.user_search_field);
@@ -50,6 +40,12 @@ public class UserChooseActivity extends Activity {
 
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+	}
+
+	@Override
+	public void getUserList(List<User> list) {
+		mUserList = list;
+		mUserListOriginal = new ArrayList<User>(mUserList);
 	}
 
 	private class Adapter extends BaseAdapter implements Filterable{

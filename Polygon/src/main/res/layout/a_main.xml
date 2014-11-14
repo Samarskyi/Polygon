@@ -20,13 +20,16 @@
 			android:id="@+id/login"
 			android:layout_width="match_parent"
 			android:layout_height="50dp"
-			android:hint="@string/username"/>
+			android:hint="@string/username"
+			android:inputType="text"
+			android:imeOptions="actionNext"/>
 	<EditText
 			android:id="@+id/password"
 			android:layout_width="match_parent"
 			android:layout_height="50dp"
 			android:hint="@string/password"
-			android:inputType="textPassword"/>
+			android:inputType="textPassword"
+			android:imeOptions="actionDone"/>
 	<Button
 			android:id="@+id/login_btn"
 			android:layout_width="wrap_content"
