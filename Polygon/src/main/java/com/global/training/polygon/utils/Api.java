@@ -21,6 +21,9 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.http.GET;
+import retrofit.http.Query;
+
+//import com.mobprofs.retrofit.converters.SimpleXmlConverter;
 
 /**
  * @author  eugenii.samarskyi on 12.11.2014.
@@ -32,7 +35,10 @@ public class Api {
     private static final String TAG = Api.class.getSimpleName();
 
     private static Employees mEmployees;
+    private static OfficeTime officeTime;
+
     private static Callback<List<User>> callback;
+    private static Callback<String> timeCallback;
 
 
     public static void getUsers(final EmployeesCallback employeesCallback) {
@@ -52,7 +58,7 @@ public class Api {
         };
 
         String userInfo = PreferencesUtils.getLastUser();
-        String[] infoSplit = userInfo.split(" "); // 0 - first_name, 1 - last_name, 2 - password
+        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
 
         ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
         RestAdapter restAdapter = new RestAdapter.
@@ -94,34 +100,38 @@ public class Api {
         }).start();
     }
 
-    public static void timeWork(long from, long till, int userId, final OfficeTime officeTime){
+    public static void timeWork(long from, long till, final int userId, final OfficeTimeCallback officeTimeCallback){
 
-        callback = new Callback<List<User>>() {
-
+        timeCallback = new Callback<String>() {
             @Override
-            public void success(List<User> users, Response response) {
-                officeTime.timeList("");
+            public void success(String strings, Response response) {
+                Log.d(TAG, "parse xml success" + strings);
+                officeTimeCallback.getTimeList(strings);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.d(TAG, "Fail get users: " + error.getMessage());
-                error.printStackTrace();
+                Log.d(TAG, "parse xml fail" + error.getMessage());
             }
         };
 
-        String userInfo = PreferencesUtils.getLastUser();
-        String[] infoSplit = userInfo.split(" "); // 0 - first_name, 1 - last_name, 2 - password
 
-        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0] + "." + infoSplit[1], infoSplit[2]);
-        RestAdapter restAdapter = new RestAdapter.
-                Builder().setEndpoint(URL_EMPLOYEES).
-                setRequestInterceptor(requestInterceptor)
-                .setConverter(new SimpleXmlConverter()).
+//        String userInfo = PreferencesUtils.getLastUser();
+//        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
+
+        String  login = "eugenii.samarskyi";
+        String  pass = "[pi989898pi]!";
+
+        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(login, pass);
+        RestAdapter restAdapter = new RestAdapter.Builder().
+                setEndpoint(URL_GLOBAL_LOGIC).
+                setRequestInterceptor(requestInterceptor).
+                setConverter(new SimpleXmlConverter()).
+                setLogLevel(RestAdapter.LogLevel.FULL).
                 build();
 
-        mEmployees = restAdapter.create(Employees.class);
-        mEmployees.employeeList(callback);
+        officeTime = restAdapter.create(OfficeTime.class);
+        officeTime.timeList(from,till,userId,"LWO",timeCallback);
     }
 
 
@@ -133,9 +143,18 @@ public class Api {
         public void getUserList(List<User> list);
     }
 
+    public interface OfficeTimeCallback {
+        public void getTimeList(String list);
+    }
+
+
     interface OfficeTime{
-        @GET("officetime/legacy/index_new.php")
-        void timeList(String time);
+        @GET("/officetime/legacy/index_new.php")
+        void timeList(@Query("from")long from,
+                      @Query("till")long till,
+                      @Query("employeeId") int limit ,
+                      @Query("zone") String zone ,
+                       Callback<String> time);
     }
 
     interface Employees {

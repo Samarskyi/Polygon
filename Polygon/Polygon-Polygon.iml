@@ -80,12 +80,10 @@
     <orderEntry type="jdk" jdkName="Android API 20 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="retrofit-simplexmlconverter-1.1" level="project" />
-    <orderEntry type="library" exported="" name="stax-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="retrofit-1.7.1" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.5" level="project" />
     <orderEntry type="library" exported="" name="simple-xml-2.7.1" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
-    <orderEntry type="library" exported="" name="stax-api-1.0.1" level="project" />
   </component>
 </module>
 
