@@ -9,9 +9,7 @@ import com.global.training.polygon.App;
  * Created by eugenii.samarskyi on 12.11.2014.
  */
 public class PreferencesUtils {
-
     private static final String PREF_NAME = PreferencesUtils.class.getName();
-    private static final String TAG = SharedPreferences.class.getSimpleName();
 
     private static SharedPreferences mSharedPreferences = App.self().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     private static SharedPreferences.Editor mEditor = mSharedPreferences.edit();
@@ -20,7 +18,7 @@ public class PreferencesUtils {
 
         String loginPassForDecrypt = login + " " + pass;
         try {
-            mEditor.putString("lastUser",EncryptionUtils.encrypt("123456789", loginPassForDecrypt) );
+            mEditor.putString("lastUser", loginPassForDecrypt);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -28,14 +26,7 @@ public class PreferencesUtils {
     }
 
     public static String getLastUser(){
-
-       String lastUser = mSharedPreferences.getString("lastUser", null);
-        try {
-            lastUser = EncryptionUtils.decrypt("123456789", lastUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return lastUser;
+        return mSharedPreferences.getString("lastUser", null);
     }
 
 }
