@@ -68,7 +68,6 @@ public class Api {
         mEmployees.employeeList(callback);
     }
 
-
     public static void auth(final String login, final String pass, final AuthCallback authCallback) {
 
         new Thread(new Runnable() {
@@ -115,14 +114,10 @@ public class Api {
             }
         };
 
-        //todo get Credential
-//        String userInfo = PreferencesUtils.getLastUser();
-//        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
+        String userInfo = PreferencesUtils.getLastUser();
+        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
 
-        String  login = "eugenii.samarskyi";
-        String  pass = "[pi989898pi]!";
-
-        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(login, pass);
+        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
         RestAdapter restAdapter = new RestAdapter.Builder().
                 setEndpoint(URL_GLOBAL_LOGIC).
                 setRequestInterceptor(requestInterceptor).
@@ -132,7 +127,6 @@ public class Api {
         officeTime = restAdapter.create(OfficeTime.class);
         officeTime.timeList(from,till,userId,"LWO",timeCallback);
     }
-
 
     public interface AuthCallback {
         public void isAuthentication(boolean what);
@@ -145,7 +139,6 @@ public class Api {
     public interface OfficeTimeCallback {
         public void getTimeList(List<WorksTime> list);
     }
-
 
     interface OfficeTime{
           @GET("/officetime/json/events.php")
