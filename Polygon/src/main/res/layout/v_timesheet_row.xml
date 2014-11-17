@@ -17,7 +17,7 @@
 			android:layout_width="0dp"
 			android:layout_height="50dp"
 			android:layout_weight="1"
-			android:text="@string/time_oracle"
+			android:text="@string/time_oracle_selected_time"
 			android:textSize="18sp"
 			android:gravity="center"/>
 	<TextView

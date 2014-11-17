@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.global.training.polygon.R;
 import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
+import com.mobprofs.retrofit.converters.SimpleXmlConverter;
 
 public class MainActivity extends Activity implements View.OnClickListener, Api.AuthCallback{
 
@@ -27,6 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Api.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_main);
 
+		SimpleXmlConverter simpleXmlConverter = new SimpleXmlConverter();
 		autoLoginLastUser();
 
 		Button loginButton = (Button) findViewById(R.id.login_btn);
