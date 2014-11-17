@@ -1,27 +1,68 @@
 package com.global.training.polygon.model;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Root;
-
 /**
  * Created by eugenii.samarskyi on 14.11.2014.
  */
 
-@Root(name = "tr totalforday cf")
 public class WorksTime {
 
-    @Attribute(name="td td1")
-    String day;
+    String timestamp;
+    String direction;
+    int locationid;
+    String area;
+    boolean working;
 
-//    @ElementMap(entry="property", key="key", attribute=true, inline=true)
-//    private Map<String, String> map;
-
-    public String getDay() {
-        return day;
+    public WorksTime() {
     }
 
-    public void setDay(String day) {
-        this.day = day;
+    public String getTimestamp() {
+        return timestamp;
     }
 
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public int getLocationid() {
+        return locationid;
+    }
+
+    public void setLocationid(int locationid) {
+        this.locationid = locationid;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public boolean isWorking() {
+        return working;
+    }
+
+    public void setWorking(boolean working) {
+        this.working = working;
+    }
+
+    @Override
+    public String toString() {
+        return "WorksTime{" +
+                "timestamp='" + timestamp + '\'' +
+                ", direction='" + direction + '\'' +
+                ", locationid=" + locationid +
+                ", area='" + area + '\'' +
+                ", working=" + working +
+                '}';
+    }
 }

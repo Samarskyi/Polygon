@@ -3,7 +3,7 @@ package com.global.training.polygon.utils;
 import android.util.Log;
 
 import com.global.training.polygon.model.User;
-import com.mobprofs.retrofit.converters.SimpleXmlConverter;
+import com.global.training.polygon.model.WorksTime;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -23,7 +23,6 @@ import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Query;
 
-//import com.mobprofs.retrofit.converters.SimpleXmlConverter;
 
 /**
  * @author  eugenii.samarskyi on 12.11.2014.
@@ -38,7 +37,7 @@ public class Api {
     private static OfficeTime officeTime;
 
     private static Callback<List<User>> callback;
-    private static Callback<String> timeCallback;
+    private static Callback<List<WorksTime>> timeCallback;
 
 
     public static void getUsers(final EmployeesCallback employeesCallback) {
@@ -102,20 +101,21 @@ public class Api {
 
     public static void timeWork(long from, long till, final int userId, final OfficeTimeCallback officeTimeCallback){
 
-        timeCallback = new Callback<String>() {
+        timeCallback = new Callback<List<WorksTime>>() {
             @Override
-            public void success(String strings, Response response) {
+            public void success(List<WorksTime> strings, Response response) {
                 Log.d(TAG, "parse xml success" + strings);
                 officeTimeCallback.getTimeList(strings);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.d(TAG, "parse xml fail" + error.getMessage());
+                Log.d(TAG,"XML Parsing Fail :" + error.getMessage());
+                error.printStackTrace();
             }
         };
 
-
+        //todo get Credential
 //        String userInfo = PreferencesUtils.getLastUser();
 //        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
 
@@ -126,7 +126,6 @@ public class Api {
         RestAdapter restAdapter = new RestAdapter.Builder().
                 setEndpoint(URL_GLOBAL_LOGIC).
                 setRequestInterceptor(requestInterceptor).
-                setConverter(new SimpleXmlConverter()).
                 setLogLevel(RestAdapter.LogLevel.FULL).
                 build();
 
@@ -144,17 +143,17 @@ public class Api {
     }
 
     public interface OfficeTimeCallback {
-        public void getTimeList(String list);
+        public void getTimeList(List<WorksTime> list);
     }
 
 
     interface OfficeTime{
-        @GET("/officetime/legacy/index_new.php")
+          @GET("/officetime/json/events.php")
         void timeList(@Query("from")long from,
                       @Query("till")long till,
                       @Query("employeeId") int limit ,
                       @Query("zone") String zone ,
-                       Callback<String> time);
+                       Callback<List<WorksTime>> time);
     }
 
     interface Employees {
