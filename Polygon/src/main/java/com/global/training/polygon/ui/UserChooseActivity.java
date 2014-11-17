@@ -37,7 +37,7 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 				findViewById(R.id.user_search_field);
 		autoTextView.setAdapter(new Adapter());
 		autoTextView.setThreshold(1);
-		autoTextView.setOnEditorActionListener(new ImeActionListener());
+//		autoTextView.setOnEditorActionListener(new ImeActionListener());
 		autoTextView.setOnItemClickListener(this);
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
@@ -51,8 +51,12 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		Log.d("MyLog", "ID is " +mUserList.get(position).getUid());
+		Intent intent = new Intent(UserChooseActivity.this, TimeSheetActivity.class);
+		intent.putExtra("userID", mUserList.get(position).getUid());
+		intent.putExtra("userName", mUserList.get(position).toString());
+		startActivity(intent);
 
+		Log.d("MyLog", "ID is " +mUserList.get(position).getUid());
 	}
 
 	private class Adapter extends BaseAdapter implements Filterable{
@@ -119,14 +123,14 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 		}
 	}
 
-	private class ImeActionListener implements TextView.OnEditorActionListener {
-		@Override
-		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-			if (actionId == EditorInfo.IME_ACTION_DONE) {
-				startActivity(new Intent(UserChooseActivity.this, TimeSheetActivity.class));
-				return true;
-			}
-			return false;
-		}
-	}
+//	private class ImeActionListener implements TextView.OnEditorActionListener {
+//		@Override
+//		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//			if (actionId == EditorInfo.IME_ACTION_DONE) {
+//				startActivity(new Intent(UserChooseActivity.this, TimeSheetActivity.class));
+//				return true;
+//			}
+//			return false;
+//		}
+//	}
 }

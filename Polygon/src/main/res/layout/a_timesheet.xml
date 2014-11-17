@@ -1,50 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
 	<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:paddingBottom="2dp"
-			android:background="@android:color/holo_blue_light">
-		<TextView
-				android:id="@+id/date"
-				android:layout_width="0dp"
-				android:layout_height="50dp"
-				android:layout_weight="1"
-				android:text="@string/date"
-				android:textSize="18sp"
-				android:gravity="center"
-				android:background="@android:color/black"/>
-		<TextView
-				android:id="@+id/time_or_oracle"
-				android:layout_width="0dp"
-				android:layout_height="50dp"
-				android:layout_weight="1"
-				android:text="@string/time_oracle_selected_time"
-				android:textSize="18sp"
-				android:gravity="center"
-				android:layout_marginLeft="2dp"
-				android:layout_marginStart="2dp"
-				android:layout_marginRight="2dp"
-				android:layout_marginEnd="2dp"
-				android:background="@android:color/black"/>
-		<TextView
-				android:id="@+id/difference"
-				android:layout_width="0dp"
-				android:layout_height="50dp"
-				android:layout_weight="1"
-				android:text="@string/diff"
-				android:textSize="18sp"
-				android:gravity="center"
-				android:background="@android:color/black"/>
-	</LinearLayout>
-	<ListView
-			android:id="@+id/day_rows"
+			android:orientation="vertical"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
-	</ListView>
-</LinearLayout>
+
+		<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:paddingBottom="2dp"
+				android:background="@android:color/holo_blue_light">
+
+			<TextView
+					android:id="@+id/date"
+					android:layout_width="0dp"
+					android:layout_height="50dp"
+					android:layout_weight="3"
+					android:text="@string/date"
+					android:textSize="18sp"
+					android:gravity="center"
+					android:background="@android:color/black"/>
+
+			<TextView
+					android:id="@+id/time_or_oracle"
+					android:layout_width="0dp"
+					android:layout_height="50dp"
+					android:layout_weight="2"
+					android:text="@string/time_oracle_selected_time"
+					android:textSize="18sp"
+					android:gravity="center"
+					android:layout_marginLeft="2dp"
+					android:layout_marginStart="2dp"
+					android:layout_marginRight="2dp"
+					android:layout_marginEnd="2dp"
+					android:background="@android:color/black"/>
+
+			<TextView
+					android:id="@+id/difference"
+					android:layout_width="0dp"
+					android:layout_height="50dp"
+					android:layout_weight="2"
+					android:text="@string/diff"
+					android:textSize="18sp"
+					android:gravity="center"
+					android:background="@android:color/black"/>
+		</LinearLayout>
+		<ListView
+				android:id="@+id/day_rows"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+		</ListView>
+	</LinearLayout>
+	<TextView
+			android:id="@+id/profile_textview"
+			android:layout_width="200dp"
+			android:layout_height="70dp"
+			android:background="@drawable/background_textview_last_screen"
+			android:textSize="18sp"
+			android:textColor="@android:color/white"
+			android:gravity="bottom|end"
+			android:text = "Yurii Ostrovskyi"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentBottom="true"
+			android:alpha="0.4"/>
+</RelativeLayout>

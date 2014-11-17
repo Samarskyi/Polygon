@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by eugenii.samarskyi on 14.11.2014.
+ * @author  eugenii.samarskyi on 14.11.2014.
  */
 public class TimeCounter {
 

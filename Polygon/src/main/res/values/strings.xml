@@ -9,8 +9,8 @@
 	<string name="password">Password</string>
 	<string name="login_button">Login</string>
 	<string name="date">Date</string>
-	<string name="time_oracle_selected_time"><b>Time</b> / Oracle</string>
-	<string name="time_oracle_selected_oracle">Time / <b>Oracle</b></string>
+	<string name="time_oracle_selected_time">Time</string>
+	<string name="time_oracle_selected_oracle">Oracle</string>
 	<string name="diff">Difference</string>
 
 </resources>

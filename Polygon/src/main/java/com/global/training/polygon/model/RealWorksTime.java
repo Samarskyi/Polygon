@@ -3,7 +3,7 @@ package com.global.training.polygon.model;
 import java.util.Date;
 
 /**
- * Created by eugenii.samarskyi on 14.11.2014.
+ * @author eugenii.samarskyi on 14.11.2014.
  */
 public class RealWorksTime {
 
