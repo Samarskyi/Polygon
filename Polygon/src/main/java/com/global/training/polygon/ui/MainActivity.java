@@ -62,12 +62,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Api.
 	}
 	private void auth (String login, String password) {
 		startActivity(new Intent(this, UserChooseActivity.class));
-		PreferencesUtils.saveLastUser(login, password);
+		PreferencesUtils.saveCredentials(login, password);
 	}
 
 	private void autoLoginLastUser() {
-		if (PreferencesUtils.getLastUser() != null) {
-			String[] logPas = PreferencesUtils.getLastUser().split(" ");
+		if (PreferencesUtils.getCredentials() != null) {
+			String[] logPas = PreferencesUtils.getCredentials().split(" ");
 			auth(logPas[0], logPas[1]);
 		}
 	}

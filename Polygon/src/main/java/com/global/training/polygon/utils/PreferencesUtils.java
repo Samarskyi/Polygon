@@ -14,7 +14,7 @@ public class PreferencesUtils {
     private static SharedPreferences mSharedPreferences = App.self().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     private static SharedPreferences.Editor mEditor = mSharedPreferences.edit();
 
-    public static void saveLastUser(String login, String pass){
+    public static void saveCredentials(String login, String pass){
 
         String loginPassForDecrypt = login + " " + pass;
         try {
@@ -25,8 +25,20 @@ public class PreferencesUtils {
         mEditor.commit();
     }
 
-    public static String getLastUser(){
+    public static String getCredentials(){
         return mSharedPreferences.getString("lastUser", null);
     }
 
+    public static void saveLastSeenUserID(int id){
+        try {
+            mEditor.putInt("lastSeenUserId", id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mEditor.commit();
+    }
+
+    public int getLastSeenUserId(){
+        return mSharedPreferences.getInt("lastSeenUserId", -1);
+    }
 }

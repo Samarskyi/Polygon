@@ -56,7 +56,7 @@ public class Api {
             }
         };
 
-        String userInfo = PreferencesUtils.getLastUser();
+        String userInfo = PreferencesUtils.getCredentials();
         String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
 
         ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
@@ -114,7 +114,7 @@ public class Api {
             }
         };
 
-        String userInfo = PreferencesUtils.getLastUser();
+        String userInfo = PreferencesUtils.getCredentials();
         String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
 
         ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
@@ -141,7 +141,7 @@ public class Api {
     }
 
     interface OfficeTime{
-          @GET("/officetime/json/events.php")
+        @GET("/officetime/json/events.php")
         void timeList(@Query("from")long from,
                       @Query("till")long till,
                       @Query("employeeId") int limit ,
