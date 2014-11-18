@@ -33,7 +33,18 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.j256.ormlite:ormlite-android:4.46'
+    compile ('com.mobprofs:retrofit-simplexmlconverter:1.1'){
+        exclude module: 'stax'
+        exclude module: 'stax-api'
+        exclude module: 'xpp3'
+
+    }
     compile 'joda-time:joda-time:2.5'
     compile 'com.squareup.retrofit:retrofit:1.7.1'
-
+    compile ('com.mobprofs:retrofit-simplexmlconverter:1.1'){
+        exclude module: 'stax'
+        exclude module: 'stax-api'
+        exclude module: 'xpp3'
+    }
 }

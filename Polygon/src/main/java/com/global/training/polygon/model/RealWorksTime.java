@@ -1,15 +1,39 @@
 package com.global.training.polygon.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.Date;
 
 /**
  * Created by eugenii.samarskyi on 14.11.2014.
  */
+@DatabaseTable(tableName = "time_sheet")
 public class RealWorksTime {
 
-   private Date date;
-   private long totalSpendTime;
+    public final static String ID_FIELD = "user_id";
+    public final static String DATE_FIELD = "date";
+    public final static String TOTAL_TIME_FIELD = "total_time";
 
+    @DatabaseField(generatedId = true)
+    private int id;
+
+    @DatabaseField(index = true, canBeNull = false, columnName = ID_FIELD)
+    private int user_id;
+
+    @DatabaseField(columnName = DATE_FIELD)
+    private Date date;
+
+    @DatabaseField(columnName = TOTAL_TIME_FIELD)
+    private long totalSpendTime;
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
 
     public Date getDate() {
         return date;
@@ -37,6 +61,6 @@ public class RealWorksTime {
 
         return "RealWorksTime{" +
                 "date = " + date +
-                ", Hours : " + diffHours + " , Minutes : " + diffMinutes +  " , Seconds: " + diffSeconds + '}';
+                ", Hours : " + diffHours + " , Minutes : " + diffMinutes + " , Seconds: " + diffSeconds + '}';
     }
 }

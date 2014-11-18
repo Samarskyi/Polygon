@@ -36,13 +36,13 @@ public class Api {
     private static Employees mEmployees;
     private static OfficeTime officeTime;
 
-    private static Callback<List<User>> callback;
+    private static Callback<List<User>> usersCallback;
     private static Callback<List<WorksTime>> timeCallback;
 
 
     public static void getUsers(final EmployeesCallback employeesCallback) {
 
-        callback = new Callback<List<User>>() {
+        usersCallback = new Callback<List<User>>() {
 
             @Override
             public void success(List<User> users, Response response) {
@@ -65,7 +65,7 @@ public class Api {
                 setRequestInterceptor(requestInterceptor).build();
 
         mEmployees = restAdapter.create(Employees.class);
-        mEmployees.employeeList(callback);
+        mEmployees.employeeList(usersCallback);
     }
 
     public static void auth(final String login, final String pass, final AuthCallback authCallback) {
@@ -102,9 +102,9 @@ public class Api {
 
         timeCallback = new Callback<List<WorksTime>>() {
             @Override
-            public void success(List<WorksTime> strings, Response response) {
-                Log.d(TAG, "parse xml success" + strings);
-                officeTimeCallback.getTimeList(strings);
+            public void success(List<WorksTime> worksTimeList, Response response) {
+                Log.d(TAG, "parse xml success" + worksTimeList);
+                officeTimeCallback.getTimeList(worksTimeList);
             }
 
             @Override
@@ -125,7 +125,7 @@ public class Api {
                 build();
 
         officeTime = restAdapter.create(OfficeTime.class);
-        officeTime.timeList(from,till,userId,"LWO",timeCallback);
+        officeTime.timeList(from, till, userId, "LWO", timeCallback);
     }
 
     public interface AuthCallback {
