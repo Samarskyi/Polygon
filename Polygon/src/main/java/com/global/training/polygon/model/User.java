@@ -7,7 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 /**
  * @author yurii.ostrovskyi
  */
-@DatabaseTable(tableName="users")
+@DatabaseTable(tableName = "users")
 public class User {
 
     public final static String ID_FIELD = "user_id";
@@ -32,12 +32,12 @@ public class User {
 
     private boolean isWorksNow;
 
-	public User(String first_name, String last_name) {
-		this.first_name = first_name;
-		this.last_name = last_name;
-	}
+    public User(String first_name, String last_name) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+    }
 
-	public int getUid() {
+    public int getUid() {
         return uid;
     }
 
@@ -79,12 +79,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "uid=" + uid +
-                ", zone='" + zone + '\'' +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", isWorksNow=" + isWorksNow +
-                '}';
+        return first_name + " " + last_name;
     }
 }

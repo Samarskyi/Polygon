@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.global.training.polygon.R;
 import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
-import com.mobprofs.retrofit.converters.SimpleXmlConverter;
 
 public class MainActivity extends Activity implements View.OnClickListener, Api.AuthCallback{
 
