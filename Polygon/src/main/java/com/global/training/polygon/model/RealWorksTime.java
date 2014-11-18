@@ -6,7 +6,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 
 /**
- * Created by eugenii.samarskyi on 14.11.2014.
+ * @author eugenii.samarskyi on 14.11.2014.
  */
 @DatabaseTable(tableName = "time_sheet")
 public class RealWorksTime {
