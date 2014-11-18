@@ -16,6 +16,7 @@ import java.util.List;
 public class TimeCounter {
 
     static SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+    static SimpleDateFormat shortFormatter = new SimpleDateFormat("yyyy/MM/dd");
 
     private static int getDayNumber(String time) {
         Date date = null;
@@ -44,7 +45,18 @@ public class TimeCounter {
         return date;
     }
 
-    public static List<RealWorksTime> getRealTime(List<WorksTime> list) {
+    public static Date getShortDateFromString(String dateString) {
+        Date date = null;
+        try {
+            date = shortFormatter.parse(dateString);
+        } catch (ParseException e) {
+            Log.e(TimeCounter.class.getSimpleName(), dateString);
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public static List<RealWorksTime> getRealTime(List<WorksTime> list, final int userId) {
 
         List<WorksTime> newList = list;
 
@@ -83,6 +95,7 @@ public class TimeCounter {
         for (List<WorksTime> times : fullList) {
             Date date = getDateFromString(times.get(0).getTimestamp());
             RealWorksTime realWorksTime = new RealWorksTime();
+            realWorksTime.setUser_id(userId);
             realWorksTime.setDate(date);
 
             String timeStampOut = null;

@@ -2,6 +2,9 @@ package com.global.training.polygon.utils;
 
 import android.util.Log;
 
+import com.global.training.polygon.db.DatabaseManager;
+import com.global.training.polygon.model.RealWorksTime;
+import com.global.training.polygon.model.TimeCounter;
 import com.global.training.polygon.model.User;
 import com.global.training.polygon.model.WorksTime;
 
@@ -14,6 +17,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import retrofit.Callback;
@@ -42,11 +46,20 @@ public class Api {
 
     public static void getUsers(final EmployeesCallback employeesCallback) {
 
+        String userInfo = PreferencesUtils.getCredentials();
+        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
+
+        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
+        RestAdapter restAdapter = new RestAdapter.
+                Builder().setEndpoint(URL_EMPLOYEES).
+                setRequestInterceptor(requestInterceptor).build();
+
         usersCallback = new Callback<List<User>>() {
 
             @Override
             public void success(List<User> users, Response response) {
                 employeesCallback.getUserList(users);
+                DatabaseManager.saveUsersToDB(users);
             }
 
             @Override
@@ -55,14 +68,6 @@ public class Api {
                 error.printStackTrace();
             }
         };
-
-        String userInfo = PreferencesUtils.getCredentials();
-        String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
-
-        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
-        RestAdapter restAdapter = new RestAdapter.
-                Builder().setEndpoint(URL_EMPLOYEES).
-                setRequestInterceptor(requestInterceptor).build();
 
         mEmployees = restAdapter.create(Employees.class);
         mEmployees.employeeList(usersCallback);
@@ -100,19 +105,16 @@ public class Api {
 
     public static void timeWork(long from, long till, final int userId, final OfficeTimeCallback officeTimeCallback){
 
-        timeCallback = new Callback<List<WorksTime>>() {
-            @Override
-            public void success(List<WorksTime> worksTimeList, Response response) {
-                Log.d(TAG, "parse xml success" + worksTimeList);
-                officeTimeCallback.getTimeList(worksTimeList);
+        try {
+            List<RealWorksTime> list = DatabaseManager.getTimeSheet(from, till, userId);
+            if(list != null){
+                for(RealWorksTime realWorksTime : list){
+                    Log.d(TAG, realWorksTime.toString());
+                }
             }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Log.d(TAG,"XML Parsing Fail :" + error.getMessage());
-                error.printStackTrace();
-            }
-        };
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         String userInfo = PreferencesUtils.getCredentials();
         String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
@@ -121,8 +123,27 @@ public class Api {
         RestAdapter restAdapter = new RestAdapter.Builder().
                 setEndpoint(URL_GLOBAL_LOGIC).
                 setRequestInterceptor(requestInterceptor).
-                setLogLevel(RestAdapter.LogLevel.FULL).
                 build();
+
+        timeCallback = new Callback<List<WorksTime>>() {
+            @Override
+            public void success(List<WorksTime> worksTimeList, Response response) {
+                Log.d(TAG, "parse xml success" + worksTimeList);
+                List<RealWorksTime> timeSheetList = TimeCounter.getRealTime(worksTimeList, userId);
+                officeTimeCallback.getTimeList(timeSheetList);
+//                DatabaseManager.saveTimeSheetToDB(timeSheetList);
+
+//                for(RealWorksTime realWorksTime : timeSheetList){
+//                    Log.d(TAG, realWorksTime.getDate().toString());
+//                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG,"XML Parsing Fail :" + error.getMessage());
+                error.printStackTrace();
+            }
+        };
 
         officeTime = restAdapter.create(OfficeTime.class);
         officeTime.timeList(from, till, userId, "LWO", timeCallback);
@@ -137,7 +158,7 @@ public class Api {
     }
 
     public interface OfficeTimeCallback {
-        public void getTimeList(List<WorksTime> list);
+        public void getTimeList(List<RealWorksTime> list);
     }
 
     interface OfficeTime{

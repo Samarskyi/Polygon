@@ -15,6 +15,9 @@ public class RealWorksTime {
     public final static String DATE_FIELD = "date";
     public final static String TOTAL_TIME_FIELD = "total_time";
 
+    public RealWorksTime() {
+    }
+
     @DatabaseField(generatedId = true)
     private int id;
 
@@ -26,6 +29,7 @@ public class RealWorksTime {
 
     @DatabaseField(columnName = TOTAL_TIME_FIELD)
     private long totalSpendTime;
+
 
     public int getUser_id() {
         return user_id;

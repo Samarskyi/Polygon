@@ -44,14 +44,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     }
 
-    public Dao getUserDao() throws SQLException{
+    public synchronized Dao getUserDao() throws SQLException{
         if(userDao == null){
             userDao =  getDao(User.class);
         }
         return userDao;
     }
 
-    public Dao getTimeSheetDao() throws SQLException{
+    public synchronized Dao getTimeSheetDao() throws SQLException{
         if(timeSheetDao == null){
             timeSheetDao = getDao(RealWorksTime.class);
         }

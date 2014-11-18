@@ -15,6 +15,9 @@ public class User {
     public final static String FIRST_NAME_FIELD = "first_name";
     public final static String LAST_NAME_FIELD = "last_name";
 
+    public User() {
+    }
+
     @DatabaseField(generatedId = true)
     private int id;
 
@@ -35,6 +38,14 @@ public class User {
     public User(String first_name, String last_name) {
         this.first_name = first_name;
         this.last_name = last_name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getUid() {

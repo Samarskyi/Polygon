@@ -5,20 +5,27 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.global.training.polygon.R;
 import com.global.training.polygon.model.RealWorksTime;
-import com.global.training.polygon.model.TimeCounter;
-import com.global.training.polygon.model.WorksTime;
 import com.global.training.polygon.utils.Api;
+
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -106,7 +113,7 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 	}
 
 	@Override
-	public void getTimeList(List<WorksTime> list) {
+	public void getTimeList(List<RealWorksTime> list) {
 		if (list.isEmpty() && mCounter < 5) {
 			getPreviousPeriod();
 			mCounter++;
@@ -121,9 +128,9 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 			return;
 		}
 		mCounter = 0;
-		List<RealWorksTime>tempList = TimeCounter.getRealTime(list);
-		for (int i = tempList.size() - 1; i >= 0; i--) {
-			mTimeSheet.add(tempList.get(i));
+//		List<RealWorksTime>tempList = TimeCounter.getRealTime(list);
+		for (int i = list.size() - 1; i >= 0; i--) {
+			mTimeSheet.add(list.get(i));
 		}
 		mTimeSheet.add(new RealWorksTime());
 		mCalendarStart.add(Calendar.SECOND, -1);
