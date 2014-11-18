@@ -1,6 +1,8 @@
 package com.global.training.polygon.ui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
@@ -27,13 +29,13 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 	private static final long WORKING_DAY_LENGTH_MILLIS = 8 * 60 * 60 * 1000;
 	private static final int THREASHHOLD = 5;
 	private TextView mTimeOracle;
+
 	private Calendar mCalendarStart;
 	private Calendar mCalendarEnd;
 
-	private Adapter mAdapter;
-
 	private int mUserId;
 
+	private Adapter mAdapter;
 	private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("EE dd.MM.yyyy");
 	private List<RealWorksTime> mTimeSheet = new ArrayList<RealWorksTime>();
 
@@ -86,6 +88,9 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 		Log.d("MyLog", "is selected " + mTimeOracle.isSelected());
 		switch (v.getId()) {
 			case R.id.profile_textview:
+				Intent intent = new Intent(this, UserChooseActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
 				break;
 			case R.id.time_or_oracle:
 				if (mTimeOracle.isSelected()) {
@@ -102,7 +107,7 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 
 	@Override
 	public void getTimeList(List<WorksTime> list) {
-		if (list.isEmpty() && mCounter < 20) {
+		if (list.isEmpty() && mCounter < 5) {
 			getPreviousPeriod();
 			mCounter++;
 			mCalendarStart.add(Calendar.SECOND, -1);
@@ -111,7 +116,7 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 			mIsLoading = false;
 			return;
 		}
-		if (mCounter > 20) {
+		if (mCounter > 5) {
 			mIsMoreData = false;
 			return;
 		}
@@ -151,14 +156,10 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 	}
 
 	private void getPreviousPeriod() {
-//		Log.d("MyLog", "end date " + new DateTime(mCalendarEnd));
 		if (!mIsLoading) {
 			DateTime endDate = new DateTime(mCalendarEnd);
 			if (endDate.getDayOfMonth() > 15) {
 				mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 16);
-//			Log.d("MyLog", "start date " + new DateTime(mCalendarStart));
-//			Log.d("MyLog", "difference " + convertToTimeRegular(new DateTime(mCalendarEnd).getMillis()
-//					- new DateTime(mCalendarStart).getMillis()));
 			} else {
 				mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 1);
 			}
@@ -195,6 +196,7 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 				view.setOnClickListener(null);
 				view.setOnLongClickListener(null);
 				view.setClickable(false);
+
 				return view;
 			}
 			if (view == null) {
@@ -205,8 +207,17 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 			TextView difference = (TextView) view.findViewById(R.id.difference_in_row);
 
 			Long timeSpentAtWork = mTimeSheet.get(position).getTotalSpendTime();
+			Long differenceMillis = timeSpentAtWork - WORKING_DAY_LENGTH_MILLIS;
+
 			dateField.setText(mSimpleDateFormat.format(mTimeSheet.get(position).getDate()));
-			difference.setText(convertToTimeRegular(timeSpentAtWork - WORKING_DAY_LENGTH_MILLIS));
+			difference.setText(convertToTimeRegular(differenceMillis));
+
+			if (differenceMillis > 0) {
+				difference.setTextColor(Color.GREEN);
+			} else {
+				difference.setTextColor(Color.RED);
+			}
+
 			if (mTimeOracle.isSelected()) {
 				workedHours.setText(convertToTimeRegular(timeSpentAtWork));
 			} else {
@@ -216,6 +227,7 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 			if (getCount() < position + THREASHHOLD && mIsMoreData) {
 				getPreviousPeriod();
 			}
+
 			return view;
 		}
 	}

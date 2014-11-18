@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author yurii.ostrovskyi
  */
-public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener, Api.EmployeesCallback{
+public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener, Api.EmployeesCallback {
 
 	private List<User> mUserList;
 	private List<User> mUserListOriginal;
@@ -37,10 +37,9 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 				findViewById(R.id.user_search_field);
 		autoTextView.setAdapter(new Adapter());
 		autoTextView.setThreshold(1);
-//		autoTextView.setOnEditorActionListener(new ImeActionListener());
 		autoTextView.setOnItemClickListener(this);
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
 	@Override
@@ -56,10 +55,10 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 		intent.putExtra("userName", mUserList.get(position).toString());
 		startActivity(intent);
 
-		Log.d("MyLog", "ID is " +mUserList.get(position).getUid());
+		Log.d("MyLog", "ID is " + mUserList.get(position).getUid());
 	}
 
-	private class Adapter extends BaseAdapter implements Filterable{
+	private class Adapter extends BaseAdapter implements Filterable {
 
 		@Override
 		public int getCount() {
@@ -122,15 +121,4 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 			};
 		}
 	}
-
-//	private class ImeActionListener implements TextView.OnEditorActionListener {
-//		@Override
-//		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//			if (actionId == EditorInfo.IME_ACTION_DONE) {
-//				startActivity(new Intent(UserChooseActivity.this, TimeSheetActivity.class));
-//				return true;
-//			}
-//			return false;
-//		}
-//	}
 }
