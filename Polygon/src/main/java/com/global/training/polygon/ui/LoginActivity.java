@@ -16,7 +16,7 @@ import com.global.training.polygon.R;
 import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
 
-public class MainActivity extends Activity implements View.OnClickListener, Api.AuthCallback{
+public class LoginActivity extends Activity implements View.OnClickListener, Api.AuthCallback{
 
 	private EditText mLoginField;
 	private EditText mPasswordField;
@@ -62,14 +62,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Api.
 	}
 
     private void auth(String login, String password) {
-        startActivity(new Intent(this, UserChooseActivity.class));
-        //TODO stub
-        if (TextUtils.isEmpty(login)) {
-            PreferencesUtils.saveCredentials("eugenii.samarskyi", "[PA989898pa]!");
-        } else {
-            PreferencesUtils.saveCredentials(login, password);
+
+		//TODO stub
+		if (TextUtils.isEmpty(login)) {
+			PreferencesUtils.saveCredentials("eugenii.samarskyi", "[PA989898pa]!");
+		} else {
+			PreferencesUtils.saveCredentials(login, password);
         }
-    }
+
+		Intent userChooserActivity = new Intent(this, UserChooseActivity.class);
+//		userChooserActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK & Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(userChooserActivity);
+		finish();
+	}
 
     private void autoLoginLastUser() {
         if (PreferencesUtils.getCredentials() != null) {

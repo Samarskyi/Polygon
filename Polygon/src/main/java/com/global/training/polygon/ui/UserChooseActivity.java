@@ -50,6 +50,7 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 	public void getUserList(List<User> list) {
 		mUserList = list;
 		mUserListOriginal = new ArrayList<User>(mUserList);
+		Log.d("XXX", "Size of original list = " + mUserListOriginal.size() + " , size of filtered list + " + mUserList.size());
 	}
 
 	@Override

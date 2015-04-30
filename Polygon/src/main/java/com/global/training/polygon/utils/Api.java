@@ -44,6 +44,36 @@ public class Api {
     private static Callback<List<User>> usersCallback;
     private static Callback<List<WorksTime>> timeCallback;
 
+    public static void auth(final String login, final String pass, final AuthCallback authCallback) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpGet httpGet = new HttpGet(URL_EMPLOYEES);
+
+                    //TODO login stub
+                    if (TextUtils.isEmpty(login)) {
+                        Log.d("XXX", "Login is empty! Use stub");
+                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[PA989898pa]!"), "UTF-8", false));
+                    } else {
+                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(login, pass), "UTF-8", false));
+                    }
+                    HttpResponse httpResponse = httpclient.execute(httpGet);
+                    StatusLine statusLine = httpResponse.getStatusLine();
+                    int statusCode = statusLine.getStatusCode();
+                    boolean result = false;
+                    if (statusCode == 200) {
+                        result = true;
+                    }
+                    authCallback.isAuthentication(result);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
     public static void getUsers(final EmployeesCallback employeesCallback) {
 
@@ -86,37 +116,6 @@ public class Api {
         mEmployees.employeeList(usersCallback);
     }
 
-    public static void auth(final String login, final String pass, final AuthCallback authCallback) {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpGet httpGet = new HttpGet(URL_EMPLOYEES);
-
-                    //TODO login stub
-                    if (TextUtils.isEmpty(login)) {
-                        Log.d("XXX", "Login is empty! Use stub");
-                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[PA989898pa]!"), "UTF-8", false));
-                    } else {
-                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(login, pass), "UTF-8", false));
-                    }
-                    HttpResponse httpResponse = httpclient.execute(httpGet);
-                    StatusLine statusLine = httpResponse.getStatusLine();
-                    int statusCode = statusLine.getStatusCode();
-                    boolean result = false;
-                    if (statusCode == 200) {
-                        result = true;
-                    }
-                    authCallback.isAuthentication(result);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
     public static void timeWork(long from, long till, final int userId, final OfficeTimeCallback officeTimeCallback) {
         Log.d(TAG, "New callback, userId : " + userId + ". From : " + new Date(from) + ", till :" + new Date(till));
         /*try {
@@ -148,6 +147,7 @@ public class Api {
             public void success(List<WorksTime> worksTimeList, Response response) {
                 Log.d(TAG, "parse xml success" + worksTimeList);
                 List<RealWorksTime> timeSheetList = TimeCounter.getRealTime(worksTimeList, userId);
+
                 Log.d(TAG, "realTimeSheet size: " + timeSheetList.size());
                 officeTimeCallback.getTimeList(timeSheetList);
                 DatabaseManager.saveTimeSheetToDB(timeSheetList);
