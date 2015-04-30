@@ -3,6 +3,7 @@ package com.global.training.polygon.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -59,13 +60,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Api.
 		mPassword =  mPasswordField.getText().toString();
 		Api.auth(mLogin, mPassword, this);
 	}
-	private void auth (String login, String password) {
-		startActivity(new Intent(this, UserChooseActivity.class));
-		PreferencesUtils.saveCredentials(login, password);
-	}
 
-	private void autoLoginLastUser() {
-		if (PreferencesUtils.getCredentials() != null) {
+    private void auth(String login, String password) {
+        startActivity(new Intent(this, UserChooseActivity.class));
+        //TODO stub
+        if (TextUtils.isEmpty(login)) {
+            PreferencesUtils.saveCredentials("eugenii.samarskyi", "[PA989898pa]!");
+        } else {
+            PreferencesUtils.saveCredentials(login, password);
+        }
+    }
+
+    private void autoLoginLastUser() {
+        if (PreferencesUtils.getCredentials() != null) {
 			String[] logPas = PreferencesUtils.getCredentials().split(" ");
 			auth(logPas[0], logPas[1]);
 		}

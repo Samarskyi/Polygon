@@ -35,6 +35,30 @@ public class DatabaseManager {
         mDatabaseHelper = null;
     }
 
+    public static boolean checkForCompleteDays(RealWorksTime time){
+        boolean result = true;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time.getDate().getTime());
+
+        if(calendar.get(Calendar.DAY_OF_MONTH) == Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
+            result = false;
+        }
+
+        return result;
+    }
+
+    public static boolean checkForCompleteDays(List<RealWorksTime> time){
+        boolean result = true;
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(time.getDate().getTime());
+//
+//        if(calendar.get(Calendar.DAY_OF_MONTH) == Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
+//            result = false;
+//        }
+
+        return result;
+    }
+
     public static void saveTimeSheetToDB(final List<RealWorksTime> list){
         if (mDatabaseHelper == null) {
             initHelper(App.self());
@@ -48,13 +72,14 @@ public class DatabaseManager {
                 try {
                     timeSheetDao = mDatabaseHelper.getTimeSheetDao();
                     for(RealWorksTime time : list){
-                        timeSheetDao.create(time);
+                        if(checkForCompleteDays(time)){
+                            timeSheetDao.createIfNotExists(time);
+                        }
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 Log.d(TAG, "TimeSheet is saved");
-                releaseHelper();
             }
         });
 
@@ -84,14 +109,32 @@ public class DatabaseManager {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
-                releaseHelper();
             }
         });
 
         thread.start();
 
     }
+    public static List<User> getUsersFromDB(){
+        List<User> list = null;
+        try {
+        if (mDatabaseHelper == null) {
+            initHelper(App.self());
+        }
+
+             list = mDatabaseHelper.getUserDao().queryForAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+//        releaseHelper();
+//        if(list!= null && list.size() != 0){
+////            for(User user : list){
+////                Log.d(TAG, "User id: " + user.getUid() + ", user name: " + user.getFirst_name());
+////            }
+//        }
+        return list;
+    }
+
 
     public static List<RealWorksTime> getTimeSheet(long from, long till, int userId) throws SQLException {
 
@@ -99,25 +142,25 @@ public class DatabaseManager {
             initHelper(App.self());
         }
 
-        Calendar fromCalendar = Calendar.getInstance();
-        fromCalendar.setTimeInMillis(from);
-        fromCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        fromCalendar.set(Calendar.SECOND, 0);
-
-        Calendar tillCalendar = Calendar.getInstance();
-        tillCalendar.setTimeInMillis(till);
-        tillCalendar.set(Calendar.HOUR_OF_DAY, 23);
-        tillCalendar.set(Calendar.SECOND, 0);
-
-        Date fromDate = fromCalendar.getTime();
-        Date toDate = tillCalendar.getTime();
-        Log.d(TAG, "From : " + fromDate.toString() + ", to :" +toDate);
+//        Calendar fromCalendar = Calendar.getInstance();
+//        fromCalendar.setTimeInMillis(from);
+//        fromCalendar.set(Calendar.HOUR_OF_DAY, 0);
+//        fromCalendar.set(Calendar.SECOND, 0);
+//
+//        Calendar tillCalendar = Calendar.getInstance();
+//        tillCalendar.setTimeInMillis(till);
+//        tillCalendar.set(Calendar.HOUR_OF_DAY, 23);
+//        tillCalendar.set(Calendar.SECOND, 0);
+//
+//        Date fromDate = fromCalendar.getTime();
+//        Date toDate = tillCalendar.getTime();
+//        Log.d(TAG, "From : " + fromDate.toString() + ", to :" + toDate + " , id :" + userId );
 
         Dao timeSheetDao = mDatabaseHelper.getTimeSheetDao();
 
         List<RealWorksTime> list = (List<RealWorksTime>) timeSheetDao.queryBuilder()
                 .where()
-                .between(RealWorksTime.DATE_FIELD,fromDate,toDate)
+                .between(RealWorksTime.DATE_FIELD, new Date(from), new Date(till))
                 .and()
                 .eq(RealWorksTime.ID_FIELD, userId).query();
 

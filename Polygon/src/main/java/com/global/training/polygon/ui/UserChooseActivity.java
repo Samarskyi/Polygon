@@ -37,11 +37,11 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 
 		Api.getUsers(this);
 
-		AutoCompleteTextView autoTextView = (AutoCompleteTextView)
-				findViewById(R.id.user_search_field);
+		AutoCompleteTextView autoTextView = (AutoCompleteTextView)findViewById(R.id.user_search_field);
 		autoTextView.setAdapter(new Adapter());
 		autoTextView.setThreshold(1);
 		autoTextView.setOnItemClickListener(this);
+
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
@@ -59,7 +59,7 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 		intent.putExtra("userName", mUserList.get(position).toString());
 		startActivity(intent);
 
-		Log.d("MyLog", "ID is " + mUserList.get(position).getUid());
+		Log.d(UserChooseActivity.class.getSimpleName(), "UserId : " + mUserList.get(position).getUid());
 	}
 
 	private class Adapter extends BaseAdapter implements Filterable {

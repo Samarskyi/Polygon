@@ -54,8 +54,9 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_timesheet);
+        mUserId = getIntent().getIntExtra("userID", 1);
 
-		mTimeOracle = (TextView) findViewById(R.id.time_or_oracle);
+        mTimeOracle = (TextView) findViewById(R.id.time_or_oracle);
 		TextView currentUser = (TextView) findViewById(R.id.profile_textview);
 		ListView listView = (ListView) findViewById(R.id.day_rows);
 
@@ -63,18 +64,19 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 		listView.setAdapter(mAdapter);
 
 		mCalendarEnd = new GregorianCalendar();
-		getPreviousPeriod();
-		mUserId = getIntent().getIntExtra("userID", 1);
-		mTimeOracle.setSelected(true);
+
+        mTimeOracle.setSelected(true);
 		mTimeOracle.setText(R.string.time_oracle_selected_time);
 		mTimeOracle.setOnClickListener(this);
 		currentUser.setOnClickListener(this);
 		currentUser.setText(getIntent().getStringExtra("userName"));
 
-	}
+        getPreviousPeriod();
+        Log.d(TimeSheetActivity.class.getSimpleName(), "UserID : " + mUserId);
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu, menu);
 		return true;
 	}
@@ -114,8 +116,9 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 
 	@Override
 	public void getTimeList(List<RealWorksTime> list) {
-		if (list.isEmpty() && mCounter < 5) {
-			getPreviousPeriod();
+        Log.d("XXX", "getTimeList");
+        if (list.isEmpty() && mCounter < 5) {
+            getPreviousPeriod();
 			mCounter++;
 			mCalendarStart.add(Calendar.SECOND, -1);
 			mCalendarEnd = mCalendarStart;
@@ -180,8 +183,9 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 		@Override
 		public int getCount() {
 			if (mTimeSheet.size() <= 1) {
-				getPreviousPeriod();
-			}
+                Log.d("XXX", "Adapter > getCount");
+                getPreviousPeriod();
+            }
 			return mTimeSheet.size();
 		}
 
@@ -232,9 +236,9 @@ public class TimeSheetActivity extends Activity implements AdapterView.OnClickLi
 			}
 
 			if (getCount() < position + THREASHHOLD && mIsMoreData) {
-				getPreviousPeriod();
+                Log.d("XXX", "getView");
+                getPreviousPeriod();
 			}
-
 			return view;
 		}
 	}
