@@ -98,8 +98,8 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     private void drawSimpleGrid(Canvas canvas) {
         canvas.drawColor(color);
 
-        int y = maxH;
-        int separator = (maxH) / 7;
+        float y = maxH - graphMorginBott;
+        float separator = (y) / 6;
         int startX = squareMargin + graphMorgin;
         int endX = maxW - squareMargin - graphMorgin;
         int hour = 0;
@@ -116,15 +116,15 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
             y -= separator;
         }
         //TODO draw Graph
-        y = maxH;
+        y = maxH - graphMorginBott;
         startX = squareMargin + graphMorgin + paddingFirstHourGraph;
         int totalSpaceForRectangles = endX - startX;
 
         int spaceForSingleRectangle = totalSpaceForRectangles / 5;
 
-        int hourInPixel = (y - separator) / 12;
+        float hourInPixel = (y) / 12;
 //        int hourInPixel = (maxH - squareMargin*2 - graphMorginBott - squareHeight) / 12;
-        int currentHours = 0;
+        float currentHours = 0;
 
         if (hoursWorked != null) {
             for (int days = 0; days < hoursWorked.length; days++) {
