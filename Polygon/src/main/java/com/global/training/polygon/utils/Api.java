@@ -78,10 +78,10 @@ public class Api {
     public static void getUsers(final EmployeesCallback employeesCallback) {
 
         List<User> userList = DatabaseManager.getUsersFromDB();
-        if (userList.size() != 0) {
-            employeesCallback.getUserList(userList);
-            return;
-        }
+//        if (userList.size() != 0) {
+//            employeesCallback.getUserList(userList);
+//            return;
+//        }
 
         String userInfo = PreferencesUtils.getCredentials();
         String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password

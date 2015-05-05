@@ -48,7 +48,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 	@Override
 	public void isAuthentication(boolean what) {
 		if (what) {
-			auth(mLogin, mPassword);
+			openUserChooseActivity(mLogin, mPassword);
 		} else {
 			Toast.makeText(this, "Authentication failed", Toast.LENGTH_LONG).show();
 			mPasswordField.setText("");
@@ -61,7 +61,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 		Api.auth(mLogin, mPassword, this);
 	}
 
-    private void auth(String login, String password) {
+	private void openUserChooseActivity(String login, String password) {
 
 		//TODO stub
 		if (TextUtils.isEmpty(login)) {
@@ -70,8 +70,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 			PreferencesUtils.saveCredentials(login, password);
         }
 
-		Intent userChooserActivity = new Intent(this, UserChooseActivity.class);
-//		userChooserActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK & Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		Intent userChooserActivity = new Intent(this, TimeSheetActivity.class);
 		startActivity(userChooserActivity);
 		finish();
 	}
@@ -79,7 +78,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
     private void autoLoginLastUser() {
         if (PreferencesUtils.getCredentials() != null) {
 			String[] logPas = PreferencesUtils.getCredentials().split(" ");
-			auth(logPas[0], logPas[1]);
+			openUserChooseActivity(logPas[0], logPas[1]);
 		}
 	}
 

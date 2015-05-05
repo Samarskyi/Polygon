@@ -23,9 +23,7 @@ import com.global.training.polygon.utils.Api;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author yurii.ostrovskyi
- */
+
 public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener, Api.EmployeesCallback {
 
 	private List<User> mUserList;
@@ -60,7 +58,7 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 		intent.putExtra("userName", mUserList.get(position).toString());
 		startActivity(intent);
 
-		Log.d(UserChooseActivity.class.getSimpleName(), "UserId : " + mUserList.get(position).getUid());
+		Log.d("XXX", "UserId : " + mUserList.get(position).getUid() + ", name: " +  mUserList.get(position).toString());
 	}
 
 	private class Adapter extends BaseAdapter implements Filterable {
