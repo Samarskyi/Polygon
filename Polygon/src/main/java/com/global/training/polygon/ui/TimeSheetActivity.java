@@ -145,10 +145,11 @@ public class TimeSheetActivity extends Activity implements
 
 		float[] times = new float[mTimeSheetList.size()];
 		for (int i = 0; i < mTimeSheetList.size(); i++) {
-			Log.d("XXX", "Works time:" + Float.parseFloat(convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime())));
-			times[i] = Float.parseFloat(convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime()));
+			Log.d("XXX", "Works time r:" + Float.parseFloat(convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime())));
+			Log.d("XXX", "Works time o:" + Float.parseFloat(convertToTimeOracle(mTimeSheetList.get(i).getTotalSpendTime())));
+			times[i] = Math.abs(Float.parseFloat(convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime())));
 		}
-//		graphView.setHoursWorked(times);
+		graphView.setHoursWorked(times);
 
 //		mTimeSheetList.add(new RealWorksTime());
 //		mCalendarStart.add(Calendar.SECOND, -1);

@@ -4,7 +4,7 @@
     <dimen name="morgin_square_time">10dp</dimen>
     <dimen name="square_height">100dp</dimen>
     <dimen name="graph_morgin">20dp</dimen>
-    <dimen name="graph_morgin_bott">100dp</dimen>
+    <dimen name="graph_morgin_bott">80dp</dimen>
     <dimen name="space_between_hour_rectangle">10dp</dimen>
     <dimen name="first_hours_graph_padding">20dp</dimen>
 </resources>

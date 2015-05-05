@@ -77,7 +77,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawSimpleGrid(canvas);
-//        drawHours(canvas);
+        drawHours(canvas);
     }
 
     private void drawHours(Canvas canvas) {
@@ -99,7 +99,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         canvas.drawColor(color);
 
         float y = maxH - graphMorginBott;
-        float separator = (y) / 6;
+        float separator = (y - squareHeight - squareMargin*2) / 6;
         int startX = squareMargin + graphMorgin;
         int endX = maxW - squareMargin - graphMorgin;
         int hour = 0;
@@ -115,15 +115,14 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
             hour += 2;
             y -= separator;
         }
-        //TODO draw Graph
+
         y = maxH - graphMorginBott;
         startX = squareMargin + graphMorgin + paddingFirstHourGraph;
         int totalSpaceForRectangles = endX - startX;
 
         int spaceForSingleRectangle = totalSpaceForRectangles / 5;
 
-        float hourInPixel = (y) / 12;
-//        int hourInPixel = (maxH - squareMargin*2 - graphMorginBott - squareHeight) / 12;
+        float hourInPixel = (y - squareHeight - squareMargin*2) / 12;
         float currentHours = 0;
 
         if (hoursWorked != null) {
@@ -143,8 +142,9 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
         hoursPaint = new Paint();
         hoursPaint.setColor(Color.WHITE);
-        hoursPaint.setStrokeWidth(2);
-        hoursPaint.setTextSize(20);
+        hoursPaint.setStrokeWidth(3);
+        hoursPaint.setTextSize(22);
+        hoursPaint.setAntiAlias(true);
     }
 
     private void initFromResource() {
