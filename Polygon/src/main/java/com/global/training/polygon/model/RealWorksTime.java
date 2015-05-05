@@ -3,6 +3,7 @@ package com.global.training.polygon.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -16,6 +17,11 @@ public class RealWorksTime {
     public final static String TOTAL_TIME_FIELD = "total_time";
 
     public RealWorksTime() {
+    }
+
+    public RealWorksTime( Date date, long totalSpendTime) {
+        this.date = date;
+        this.totalSpendTime = totalSpendTime;
     }
 
     @DatabaseField(generatedId = true)
@@ -66,5 +72,13 @@ public class RealWorksTime {
         return "RealWorksTime{" +
                 "date = " + date +
                 ", Hours : " + diffHours + " , Minutes : " + diffMinutes + " , Seconds: " + diffSeconds + '}';
+    }
+
+    public static class CustomComparator implements Comparator<RealWorksTime> {
+
+        @Override
+        public int compare(RealWorksTime lhs, RealWorksTime rhs) {
+            return lhs.getDate().compareTo(rhs.getDate());
+        }
     }
 }

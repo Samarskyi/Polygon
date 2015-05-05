@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.global.training.polygon.R;
 import com.global.training.polygon.model.RealWorksTime;
+import com.global.training.polygon.model.TimeCounter;
 import com.global.training.polygon.model.User;
 import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author yurii.ostrovskyi
@@ -58,9 +58,10 @@ public class TimeSheetActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_timesheet);
+		getActionBar().setDisplayShowTitleEnabled(false);
 		graphView = (GraphView) findViewById(R.id.graph);
-//		setContentView(graphView);
 		Api.getUsers(this);
+
 //        mUserId = getIntent().getIntExtra("userID", 1);
 
 //        mTimeOracle = (TextView) findViewById(R.id.time_or_oracle);
@@ -143,13 +144,13 @@ public class TimeSheetActivity extends Activity implements
 			mTimeSheetList.add(list.get(i));
 		}
 
-		float[] times = new float[mTimeSheetList.size()];
+//		float[] times = new float[mTimeSheetList.size()];
 		for (int i = 0; i < mTimeSheetList.size(); i++) {
-			Log.d("XXX", "Works time r:" + Float.parseFloat(convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime())));
-			Log.d("XXX", "Works time o:" + Float.parseFloat(convertToTimeOracle(mTimeSheetList.get(i).getTotalSpendTime())));
-			times[i] = Math.abs(Float.parseFloat(convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime())));
+			Log.d("XXX", "Works time r:" + Float.parseFloat(TimeCounter.convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime())));
+			Log.d("XXX", "Works time o:" + Float.parseFloat(TimeCounter.convertToTimeOracle(mTimeSheetList.get(i).getTotalSpendTime())));
+//			times[i] = Math.abs(Float.parseFloat((convertToTimeRegular(mTimeSheetList.get(i).getTotalSpendTime()))));
 		}
-		graphView.setHoursWorked(times);
+		graphView.setHoursWorked(mTimeSheetList);
 
 //		mTimeSheetList.add(new RealWorksTime());
 //		mCalendarStart.add(Calendar.SECOND, -1);
@@ -159,7 +160,7 @@ public class TimeSheetActivity extends Activity implements
 	}
 
 
-	private String convertToTimeRegular(long millis) {
+	/*private String convertToTimeRegular(long millis) {
 		if (millis < 0) {
 			return String.format("-%d.%02d",
 					Math.abs(TimeUnit.MILLISECONDS.toHours(millis)),
@@ -187,7 +188,7 @@ public class TimeSheetActivity extends Activity implements
 				TimeUnit.MILLISECONDS.toHours(millis),
 				Math.abs((int) ((TimeUnit.MILLISECONDS.toMinutes(millis) -
 						TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis))) * 1.67)));
-	}
+	}*/
 
 	private void getPreviousPeriod() {
 		if (!mIsLoading) {
@@ -274,7 +275,7 @@ public class TimeSheetActivity extends Activity implements
 			Long differenceMillis = timeSpentAtWork - WORKING_DAY_LENGTH_MILLIS;
 
 			dateField.setText(mSimpleDateFormat.format(mTimeSheetList.get(position).getDate()));
-			difference.setText(convertToTimeRegular(differenceMillis));
+			difference.setText(TimeCounter.convertToTimeRegular(differenceMillis));
 
 			if (differenceMillis > 0) {
 				difference.setTextColor(Color.GREEN);
@@ -283,9 +284,9 @@ public class TimeSheetActivity extends Activity implements
 			}
 
 			if (mTimeOracle.isSelected()) {
-				workedHours.setText(convertToTimeRegular(timeSpentAtWork));
+				workedHours.setText(TimeCounter.convertToTimeRegular(timeSpentAtWork));
 			} else {
-				workedHours.setText(convertToTimeOracle(timeSpentAtWork));
+				workedHours.setText(TimeCounter.convertToTimeOracle(timeSpentAtWork));
 			}
 
 			if (getCount() < position + THREASHHOLD && mIsMoreData) {

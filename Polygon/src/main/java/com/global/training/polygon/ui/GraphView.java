@@ -11,6 +11,11 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.global.training.polygon.R;
+import com.global.training.polygon.model.RealWorksTime;
+import com.global.training.polygon.model.TimeCounter;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by sgv on 02.05.2015.
@@ -37,7 +42,10 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     int graphMorginBott;
     int spaceBetweenHourRectangle;
     int paddingFirstHourGraph;
-    float[] hoursWorked = {2.0f, 4.0f, 8.0f, 10.0f, 12.0f};
+//    float[] hoursWorked = {2.0f, 4.0f, 8.0f, 10.0f, 12.0f};
+
+    List<RealWorksTime> hoursWorked;
+    String[] dyaNames = {"Mon", "Tue", "Wed", "Thu", "Fri"};
 
     public GraphView(Context context) {
         super(context);
@@ -68,8 +76,10 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
     }
 
-    public void setHoursWorked(float[] hours) {
+    public void setHoursWorked(List<RealWorksTime> hours) {
         hoursWorked = hours;
+        TimeCounter.convertToFullWeek(hoursWorked);
+        Collections.sort(hoursWorked, new RealWorksTime.CustomComparator());
         invalidate();
     }
 
@@ -126,14 +136,32 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         float currentHours = 0;
 
         if (hoursWorked != null) {
-            for (int days = 0; days < hoursWorked.length; days++) {
-                currentHours = (int) (hoursWorked[days] * hourInPixel);
-                Log.d("XXX", "in view worked time:" + hoursWorked[days]);
-                Log.d("XXX", "in view worked time in pixels:" + (y - currentHours ));
-                canvas.drawRect(startX, y - currentHours  , startX + spaceForSingleRectangle - spaceBetweenHourRectangle, y, hoursPaint);
+            for (int days = 0; days < hoursWorked.size(); days++) {
+                float hours = Math.abs(Float.parseFloat((TimeCounter.convertToTimeRegular(hoursWorked.get(days).getTotalSpendTime()))));
+                Log.d("XXX", "in view worked time:" + hours);
+                currentHours = hours * hourInPixel;
+//
+//                Log.d("XXX", "in view worked time in pixels:" + (y - currentHours ));
+                canvas.drawRect(startX, y - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, y, hoursPaint);
                 startX += spaceForSingleRectangle;
             }
         }
+
+        startX = squareMargin + graphMorgin + paddingFirstHourGraph;
+        for (int days = 0; days < 5; days++) {
+            float textSize = textSizeInPixels(dyaNames[days], hoursPaint);
+            float shift = (spaceForSingleRectangle - textSize - spaceBetweenHourRectangle ) / 2;
+            canvas.drawText(dyaNames[days], startX + shift, y + 25, hoursPaint);
+            startX += spaceForSingleRectangle;
+        }
+    }
+
+    private float textSizeInPixels(String text, Paint paint){
+        final float densityMultiplier = getContext().getResources().getDisplayMetrics().density;
+//        final float scaledPx = 20 * densityMultiplier;
+//        paint.setTextSize(scaledPx);
+        float size = paint.measureText(text);
+        return size;
     }
 
     private void initPaint() {
@@ -143,7 +171,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         hoursPaint = new Paint();
         hoursPaint.setColor(Color.WHITE);
         hoursPaint.setStrokeWidth(3);
-        hoursPaint.setTextSize(22);
+        hoursPaint.setTextSize(25);
         hoursPaint.setAntiAlias(true);
     }
 

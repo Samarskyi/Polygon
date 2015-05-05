@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author  eugenii.samarskyi on 14.11.2014.
@@ -17,6 +18,7 @@ public class TimeCounter {
 
     static SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
     static SimpleDateFormat shortFormatter = new SimpleDateFormat("yyyy/MM/dd");
+    static int[] days = {Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY};
 
     private static int getDayNumber(String time) {
         Date date = null;
@@ -129,4 +131,78 @@ public class TimeCounter {
         return realWorksTimeList;
     }
 
+
+    public static String convertToTimeRegular(long millis) {
+        if (millis < 0) {
+            return String.format("-%d.%02d",
+                    Math.abs(TimeUnit.MILLISECONDS.toHours(millis)),
+                    Math.abs(TimeUnit.MILLISECONDS.toMinutes(millis) -
+                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)) - 1)
+            );
+        }
+        return String.format("%d.%02d",
+                TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) -
+                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis))
+        );
+    }
+
+    public static long convertToTimeRegular1(long millis) {
+        if (millis < 0) {
+
+            Math.abs(TimeUnit.MILLISECONDS.toHours(millis));
+        }
+        return TimeUnit.MILLISECONDS.toHours(millis);
+    }
+
+    public static String convertToTimeOracle(long millis) {
+        return String.format("%d.%02d",
+                TimeUnit.MILLISECONDS.toHours(millis),
+                Math.abs((int) ((TimeUnit.MILLISECONDS.toMinutes(millis) -
+                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis))) * 1.67)));
+    }
+
+
+    public static void convertToFullWeek(List<RealWorksTime> mTimeSheetList) {
+
+        if (mTimeSheetList.size() < 5) {
+//            List<RealWorksTime> r = new ArrayList<>();
+            Calendar calendar = Calendar.getInstance();
+
+
+            for (int day : days) {
+                boolean needAdd = true;
+                for (RealWorksTime list : mTimeSheetList) {
+                    calendar.setTime(list.getDate());
+                    int dayId = calendar.get(Calendar.DAY_OF_WEEK);
+                    if (day == dayId) {
+                        needAdd = false;
+                    }
+                }
+
+                if (needAdd) {
+                    Calendar dayOfWeek = Calendar.getInstance();
+                    dayOfWeek.set(Calendar.DAY_OF_WEEK, day);
+                    mTimeSheetList.add(new RealWorksTime(dayOfWeek.getTime(), 0));
+                }
+            }
+        }
+
+          /*  for (RealWorksTime list : mTimeSheetList) {
+                boolean needAdd = true;
+                calendar.setTime(list.getDate());
+                int dayId = calendar.get(Calendar.DAY_OF_WEEK);
+
+                for (int day : days) {
+                    if (dayId == day) {
+                        needAdd = false;
+                    }
+                }
+
+                if (needAdd) {
+                    mTimeSheetList.add(new RealWorksTime(list.getUser_id(), new Date(), 0));
+                }*/
+//            }
+    }
 }
+

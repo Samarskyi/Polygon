@@ -2,7 +2,9 @@ package com.global.training.polygon.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.global.training.polygon.App;
 import com.global.training.polygon.db.DatabaseManager;
 import com.global.training.polygon.model.RealWorksTime;
 import com.global.training.polygon.model.TimeCounter;
@@ -109,6 +111,7 @@ public class Api {
             public void failure(RetrofitError error) {
                 Log.d(TAG, "Fail get users: " + error.getMessage());
                 error.printStackTrace();
+                Toast.makeText(App.self(), "Try again", Toast.LENGTH_SHORT).show();
             }
         };
 
