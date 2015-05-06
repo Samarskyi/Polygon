@@ -9,14 +9,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author  eugenii.samarskyi on 14.11.2014.
+ * @author eugenii.samarskyi on 14.11.2014.
  */
 public class TimeCounter {
 
-    static SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+    static SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
     static SimpleDateFormat shortFormatter = new SimpleDateFormat("yyyy/MM/dd");
     static int[] days = {Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY};
 
@@ -34,17 +35,6 @@ public class TimeCounter {
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
         return day;
-    }
-
-    public static Date getDateFromString(String dateString) {
-        Date date = null;
-        try {
-            date = formatter.parse(dateString);
-        } catch (ParseException e) {
-            Log.e(TimeCounter.class.getSimpleName(), dateString);
-            e.printStackTrace();
-        }
-        return date;
     }
 
     public static Date getShortDateFromString(String dateString) {
@@ -107,7 +97,7 @@ public class TimeCounter {
 
             long totalWorks = 0;
 
-            for (int i = times.size()-1; i >= 0; i--) {
+            for (int i = times.size() - 1; i >= 0; i--) {
                 WorksTime worksTime = times.get(i);
 
                 if (worksTime.getDirection().equals("out")) {
@@ -118,10 +108,13 @@ public class TimeCounter {
                     in = true;
                 }
 
+
                 if (out && in) {
-                    totalWorks += (getDateFromString(timeStampOut).getTime() - getDateFromString(timeStampIn).getTime());
+                    long diff = (getDateFromString(timeStampOut).getTime() - getDateFromString(timeStampIn).getTime());
+                    totalWorks += diff;
                     in = false;
                     out = false;
+                    String s = getWorkedTime(diff);
                 }
             }
             realWorksTime.setTotalSpendTime(totalWorks);
@@ -131,6 +124,30 @@ public class TimeCounter {
         return realWorksTimeList;
     }
 
+    public static Date getDateFromString(String dateString) {
+        Date date = null;
+        try {
+            date = formatter.parse(dateString);
+        } catch (ParseException e) {
+            Log.e(TimeCounter.class.getSimpleName(), dateString);
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    private static String getWorkedTime(long totalWorks){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(totalWorks);
+        return   " "+calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
+    }
+
+    private static String diff(long time){
+        long diff = time;
+        long diffSeconds = diff / 1000 % 60;
+        long diffMinutes = diff / (60 * 1000) % 60;
+        long diffHours = diff / (60 * 60 * 1000);
+       return ""+ diffHours + ":" + diffMinutes;
+    }
 
     public static String convertToTimeRegular(long millis) {
         if (millis < 0) {
@@ -166,9 +183,7 @@ public class TimeCounter {
     public static void convertToFullWeek(List<RealWorksTime> mTimeSheetList) {
 
         if (mTimeSheetList.size() < 5) {
-//            List<RealWorksTime> r = new ArrayList<>();
             Calendar calendar = Calendar.getInstance();
-
 
             for (int day : days) {
                 boolean needAdd = true;
@@ -187,22 +202,6 @@ public class TimeCounter {
                 }
             }
         }
-
-          /*  for (RealWorksTime list : mTimeSheetList) {
-                boolean needAdd = true;
-                calendar.setTime(list.getDate());
-                int dayId = calendar.get(Calendar.DAY_OF_WEEK);
-
-                for (int day : days) {
-                    if (dayId == day) {
-                        needAdd = false;
-                    }
-                }
-
-                if (needAdd) {
-                    mTimeSheetList.add(new RealWorksTime(list.getUser_id(), new Date(), 0));
-                }*/
-//            }
     }
 }
 
