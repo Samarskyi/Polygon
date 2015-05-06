@@ -42,7 +42,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     int graphMorginBott;
     int spaceBetweenHourRectangle;
     int paddingFirstHourGraph;
-//    float[] hoursWorked = {2.0f, 4.0f, 8.0f, 10.0f, 12.0f};
+    int totalTimeSpendHeight;
 
     List<RealWorksTime> hoursWorked;
     String[] dyaNames = {"Mon", "Tue", "Wed", "Thu", "Fri"};
@@ -99,7 +99,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
         for (int i = 0; i < 3; i++) {
             Log.d("XXX", "i : " + i + ", L : " + left + ", R : " + right);
-            canvas.drawRect(left, squareMargin, right, squareHeight, hoursPaint);
+            canvas.drawRect(left, squareMargin + totalTimeSpendHeight, right, squareHeight + totalTimeSpendHeight, hoursPaint);
             left = left + average + separator;
             right = left + average;
         }
@@ -108,58 +108,62 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     private void drawSimpleGrid(Canvas canvas) {
         canvas.drawColor(color);
 
-        float y = maxH - graphMorginBott;
-        float separator = (y - squareHeight - squareMargin*2) / 6;
+        float startY = maxH - graphMorginBott;
+        float shift = startY - squareHeight - squareMargin*2 - totalTimeSpendHeight;
+        float hourSeparator = shift / 6;
+        float hourInPixel = shift / 12;
+
         int startX = squareMargin + graphMorgin;
         int endX = maxW - squareMargin - graphMorgin;
         int hour = 0;
+
+        // draw time lines
         for (int i = 0; i < 7; i++) {
             if (i == 4) {
                 hoursPaint.setColor(Color.RED);
-                canvas.drawLine(startX, y, endX, y, hoursPaint);
+                canvas.drawLine(startX, startY, endX, startY, hoursPaint);
                 hoursPaint.setColor(Color.WHITE);
             } else {
-                canvas.drawLine(startX, y, endX, y, hoursPaint);
+                canvas.drawLine(startX, startY, endX, startY, hoursPaint);
             }
-            canvas.drawText(String.valueOf(hour), squareMargin, y, hoursPaint);
+            canvas.drawText(String.valueOf(hour), squareMargin, startY, hoursPaint);
             hour += 2;
-            y -= separator;
+            startY -= hourSeparator;
         }
 
-        y = maxH - graphMorginBott;
+        startY = maxH - graphMorginBott;
         startX = squareMargin + graphMorgin + paddingFirstHourGraph;
         int totalSpaceForRectangles = endX - startX;
 
         int spaceForSingleRectangle = totalSpaceForRectangles / 5;
 
-        float hourInPixel = (y - squareHeight - squareMargin*2) / 12;
-        float currentHours = 0;
+        float currentHours;
 
+        // draw time graphic (rectangles)
         if (hoursWorked != null) {
             for (int days = 0; days < hoursWorked.size(); days++) {
                 float hours = Math.abs(Float.parseFloat((TimeCounter.convertToTimeRegular(hoursWorked.get(days).getTotalSpendTime()))));
-                Log.d("XXX", "in view worked time:" + hours);
-                currentHours = hours * hourInPixel;
-//
-//                Log.d("XXX", "in view worked time in pixels:" + (y - currentHours ));
-                canvas.drawRect(startX, y - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, y, hoursPaint);
+                if(hours > -1){
+                    currentHours = hours * hourInPixel;
+                    canvas.drawRect(startX, startY - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, startY, hoursPaint);
+                }
                 startX += spaceForSingleRectangle;
             }
         }
 
+        // draw day names
         startX = squareMargin + graphMorgin + paddingFirstHourGraph;
         for (int days = 0; days < 5; days++) {
             float textSize = textSizeInPixels(dyaNames[days], hoursPaint);
-            float shift = (spaceForSingleRectangle - textSize - spaceBetweenHourRectangle ) / 2;
-            canvas.drawText(dyaNames[days], startX + shift, y + 25, hoursPaint);
+            float shift1 = (spaceForSingleRectangle - textSize - spaceBetweenHourRectangle ) / 2;
+            canvas.drawText(dyaNames[days], startX + shift1, startY + 25, hoursPaint);
             startX += spaceForSingleRectangle;
         }
     }
 
+//    private void draw
+
     private float textSizeInPixels(String text, Paint paint){
-        final float densityMultiplier = getContext().getResources().getDisplayMetrics().density;
-//        final float scaledPx = 20 * densityMultiplier;
-//        paint.setTextSize(scaledPx);
         float size = paint.measureText(text);
         return size;
     }
@@ -183,6 +187,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         graphMorginBott = (int) getResources().getDimension(R.dimen.graph_morgin_bott);
         spaceBetweenHourRectangle = (int) getResources().getDimension(R.dimen.space_between_hour_rectangle);
         paddingFirstHourGraph = (int) getResources().getDimension(R.dimen.first_hours_graph_padding);
+        totalTimeSpendHeight = (int) getResources().getDimension(R.dimen.total_time_height);
     }
 
     private void initSizes() {
@@ -190,7 +195,6 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         maxW = getWidth();
         average = (maxW - (separator * 4)) / 3;
     }
-
 
     @Override
     public boolean onPreDraw() {

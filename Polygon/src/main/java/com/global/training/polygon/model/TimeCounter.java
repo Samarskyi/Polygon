@@ -198,7 +198,7 @@ public class TimeCounter {
                 if (needAdd) {
                     Calendar dayOfWeek = Calendar.getInstance();
                     dayOfWeek.set(Calendar.DAY_OF_WEEK, day);
-                    mTimeSheetList.add(new RealWorksTime(dayOfWeek.getTime(), 0));
+                    mTimeSheetList.add(new RealWorksTime(dayOfWeek.getTime(), -1));
                 }
             }
         }
