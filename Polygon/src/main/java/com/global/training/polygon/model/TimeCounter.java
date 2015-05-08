@@ -19,6 +19,7 @@ public class TimeCounter {
 
     static SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
     static SimpleDateFormat shortFormatter = new SimpleDateFormat("yyyy/MM/dd");
+    static SimpleDateFormat hourMinutesFormatter = new SimpleDateFormat("HH:mm");
     static int[] days = {Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY};
 
     private static int getDayNumber(String time) {
@@ -48,6 +49,18 @@ public class TimeCounter {
         return date;
     }
 
+    public static String getShortDateFromLong(long dateString) {
+        Date date = null;
+        String dateText = null;
+        try {
+            date = new Date(dateString);
+            dateText = hourMinutesFormatter.format(date);
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return dateText;
+    }
     public static List<RealWorksTime> getRealTime(List<WorksTime> list, final int userId) {
 
         List<WorksTime> newList = list;
@@ -149,27 +162,35 @@ public class TimeCounter {
        return ""+ diffHours + ":" + diffMinutes;
     }
 
+//    public static long getHours(long time) {
+//        long diffHours = time / (60 * 60 * 1000);
+//        return diffHours;
+//    }
+
+//    public static long getMinutes(long time) {
+//        long diffMinutes = time / (60 * 1000) % 60;
+//        return diffMinutes;
+//    }
+
     public static String convertToTimeRegular(long millis) {
         if (millis < 0) {
             return String.format("-%d.%02d",
                     Math.abs(TimeUnit.MILLISECONDS.toHours(millis)),
-                    Math.abs(TimeUnit.MILLISECONDS.toMinutes(millis) -
-                            TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)) - 1)
+                    Math.abs(TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)) - 1)
             );
         }
         return String.format("%d.%02d",
                 TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) -
-                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis))
+                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis))
         );
     }
 
-    public static long convertToTimeRegular1(long millis) {
-        if (millis < 0) {
-
-            Math.abs(TimeUnit.MILLISECONDS.toHours(millis));
-        }
+    public static long getHours(long millis) {
         return TimeUnit.MILLISECONDS.toHours(millis);
+    }
+
+    public static long getMinutes(long millis){
+        return  TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
     }
 
     public static String convertToTimeOracle(long millis) {

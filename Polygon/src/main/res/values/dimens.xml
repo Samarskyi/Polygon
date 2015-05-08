@@ -1,10 +1,10 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="separator">10dp</dimen>
-    <dimen name="morgin_square_time">10dp</dimen>
+    <dimen name="margin_square_time">10dp</dimen>
     <dimen name="square_height">100dp</dimen>
-    <dimen name="graph_morgin">20dp</dimen>
-    <dimen name="graph_morgin_bott">30dp</dimen>
+    <dimen name="graph_margin">20dp</dimen>
+    <dimen name="graph_margin_bottom">30dp</dimen>
     <dimen name="total_time_height">50dp</dimen>
     <dimen name="space_between_hour_rectangle">10dp</dimen>
     <dimen name="first_hours_graph_padding">20dp</dimen>
