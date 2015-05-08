@@ -1,8 +1,8 @@
 package com.global.training.polygon.ui;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.global.training.polygon.R;
@@ -31,7 +32,7 @@ import java.util.List;
 /**
  * @author yurii.ostrovskyi
  */
-public class TimeSheetActivity extends Activity implements
+public class TimeSheetActivity extends ActionBarActivity implements
 		AdapterView.OnClickListener, Api.OfficeTimeCallback, Api.EmployeesCallback {
 
 	private static final long WORKING_DAY_LENGTH_MILLIS = 8 * 60 * 60 * 1000;
@@ -54,38 +55,22 @@ public class TimeSheetActivity extends Activity implements
 	private boolean mIsMoreData = true;
 	private int mCounter = 0;
 	private GraphView graphView;
+	SearchView searchView;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_timesheet);
-		getActionBar().setDisplayShowTitleEnabled(false);
+
 		graphView = (GraphView) findViewById(R.id.graph);
 		Api.getUsers(this);
-
-//        mUserId = getIntent().getIntExtra("userID", 1);
-
-//        mTimeOracle = (TextView) findViewById(R.id.time_or_oracle);
-//		TextView currentUser = (TextView) findViewById(R.id.profile_textview);
-//		ListView listView = (ListView) findViewById(R.id.day_rows);
-
-//		mAdapter = new Adapter();
-//		listView.setAdapter(mAdapter);
-
 		mCalendarEnd = new GregorianCalendar();
 
-//        mTimeOracle.setSelected(true);
-//		mTimeOracle.setText(R.string.time_oracle_selected_time);
-//		mTimeOracle.setOnClickListener(this);
-//		currentUser.setOnClickListener(this);
-//		currentUser.setText(getIntent().getStringExtra("userName"));
-
-//        getPreviousPeriod();
-//        Log.d(TimeSheetActivity.class.getSimpleName(), "UserID : " + mUserId);
 	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu, menu);
+		getMenuInflater().inflate(R.menu.new_menu, menu);
+		searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 		return true;
 	}
 
@@ -96,6 +81,16 @@ public class TimeSheetActivity extends Activity implements
 				return true;
 			case R.id.logout:
 				return true;
+			case R.id.refresh:
+				Log.d("XXX", "Refresh");
+				graphView.setHoursWorked(null);
+				getPreviousPeriod();
+				return true;
+			case R.id.search:
+				Log.d("XXX", "Search");
+				searchView.setIconified(false);
+				return true;
+
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -140,6 +135,7 @@ public class TimeSheetActivity extends Activity implements
 //		}
 //		mCounter = 0;
 //		List<RealWorksTime>tempList = TimeCounter.getRealTime(list);
+		mTimeSheetList.clear();
 		for (int i = list.size() - 1; i >= 0; i--) {
 			mTimeSheetList.add(list.get(i));
 		}
@@ -191,7 +187,7 @@ public class TimeSheetActivity extends Activity implements
 	}*/
 
 	private void getPreviousPeriod() {
-		if (!mIsLoading) {
+//		if (!mIsLoading) {
 			DateTime endDate = new DateTime(mCalendarEnd);
 			if (endDate.getDayOfMonth() > 15) {
 				mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 16);
@@ -199,8 +195,8 @@ public class TimeSheetActivity extends Activity implements
 				mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 1);
 			}
 			Api.timeWork(mCalendarStart.getTimeInMillis(), endDate.getMillis(), mUserId, this);
-			mIsLoading = true;
-		}
+//			mIsLoading = true;
+//		}
 	}
 
 	@Override

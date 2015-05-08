@@ -17,7 +17,6 @@ import com.global.training.polygon.model.TimeCounter;
 
 import org.joda.time.MutablePeriod;
 
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,6 +33,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
     private Paint gridPaint;
     private Paint hoursPaint;
+    private Paint textPaint;
     private Paint necessaryWorkedColorLine;
     private int separator;
     private int average;
@@ -53,9 +53,9 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     private float totalStartX;
     private int workedDaysCount;
     private long workedHoursInCurrentTime;
-
-    List<RealWorksTime> hoursWorked;
-    String[] dyaNames = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+    private MutablePeriod period;
+    private List<RealWorksTime> hoursWorked;
+    private String[] dyaNames = {"Mon", "Tue", "Wed", "Thu", "Fri"};
 
     public GraphView(Context context) {
         super(context);
@@ -83,57 +83,42 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         initPaint();
         initFromResource();
         getViewTreeObserver().addOnPreDrawListener(this);
-
     }
 
     public void setHoursWorked(List<RealWorksTime> hours) {
         hoursWorked = hours;
-        TimeCounter.convertToFullWeek(hoursWorked);
-        Collections.sort(hoursWorked, new RealWorksTime.CustomComparator());
-        invalidate();
+        if (hoursWorked != null) {
 
-        workedDaysCount = 0;
-        workedHoursInCurrentTime = 0;
-        Calendar calendar = Calendar.getInstance();
-        boolean first = true;
-        MutablePeriod period = null;
-        for (RealWorksTime realWorksTime : hoursWorked) {
-            if (realWorksTime.getTotalSpendTime() > 0) {
-                workedDaysCount++;
-                if (first) {
-//                    calendar.;
-                    first = false;
-//                    calendar.set(Calendar.HOUR_OF_DAY, (int) TimeCounter.getHours(realWorksTime.getTotalSpendTime()));
-//                    calendar.set(Calendar.MINUTE, (int) TimeCounter.getMinutes(realWorksTime.getTotalSpendTime()));
+            TimeCounter.convertToFullWeek(hoursWorked);
+            Collections.sort(hoursWorked, new RealWorksTime.CustomComparator());
+            invalidate();
 
-//                    DateTime dateTime = new DateTime(calendar.getTimeInMillis());
+            workedDaysCount = 0;
+            workedHoursInCurrentTime = 0;
+            boolean first = true;
 
-                    int tempHours = (int) TimeCounter.getHours(realWorksTime.getTotalSpendTime());
-                    int tempMinutes = (int) TimeCounter.getMinutes(realWorksTime.getTotalSpendTime());
-                    period = new MutablePeriod(tempHours, tempMinutes, 0, 0);
-//                    Log.d("XXX", "Init time : " + new Date(calendar.getTimeInMillis()));
-                    Log.d("XXX", "Init time Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
+            for (RealWorksTime realWorksTime : hoursWorked) {
+                if (realWorksTime.getTotalSpendTime() > 0) {
+                    workedDaysCount++;
+                    if (first) {
+                        first = false;
 
-//                    Log.d("XXX", "Init time H: " + TimeCounter.getHours(realWorksTime.getTotalSpendTime()));
-//                    Log.d("XXX", "Init time M: " + TimeCounter.getMinutes(realWorksTime.getTotalSpendTime()));
-                } else {
-//                    calendar.add(Calendar.HOUR_OF_DAY, (int) TimeCounter.getHours(realWorksTime.getTotalSpendTime()));
-//                    calendar.add(Calendar.MINUTE, (int) TimeCounter.getMinutes(realWorksTime.getTotalSpendTime()));
-//                    calendar.add(Calendar.MINUTE, (int) TimeUnit.MILLISECONDS(realWorksTime.getTotalSpendTime()));
-//                    workedHoursInCurrentTime = TimeUnit.MILLISECONDS.toHours(calendar.getTimeInMillis());
-                    int tempHours = (int) TimeCounter.getHours(realWorksTime.getTotalSpendTime());
-                    int tempMinutes = (int) TimeCounter.getMinutes(realWorksTime.getTotalSpendTime());
-//                    period.addHours(tempHours);
-//                    period.addMinutes(tempMinutes);
-                    period.add(realWorksTime.getTotalSpendTime());
-//                    period.plusMillis((int) realWorksTime.getTotalSpendTime());
-//                    period.addHours(period.getMinutes()%60);
-//                    int minutes = period.getMinutes();
-//                    period.addMinutes();
-                    Log.d("XXX", "ADD Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
+                        int tempHours = (int) TimeCounter.getHours(realWorksTime.getTotalSpendTime());
+                        int tempMinutes = (int) TimeCounter.getMinutes(realWorksTime.getTotalSpendTime());
+                        period = new MutablePeriod(tempHours, tempMinutes, 0, 0);
+                        Log.d("XXX", "Init time Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
 
-//                    Log.d("XXX", "After added : " + Float.parseFloat((TimeCounter.convertToTimeRegular(calendar.getTimeInMillis()))));
+                    } else {
+                        period.add(realWorksTime.getTotalSpendTime());
+                        Log.d("XXX", "ADD Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
+                    }
                 }
+            }
+            if (period != null && period.getMinutes() > 59) {
+                int minutes = period.getMinutes();
+                period.addHours(TimeCounter.getHoursFromMinutes(minutes));
+                period.setMinutes(TimeCounter.getMinutesWithoutHours(minutes));
+                Log.d("XXX", "Result Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
             }
         }
     }
@@ -150,13 +135,21 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
         int left = separator;
         int right = left + average;
-        Rect rect = new Rect();
-        String text = "TOTAL HOURS WORKED 8:45 of 16";
-        gridPaint.getTextBounds(text, 0, text.length() - 1, rect);
+        Rect textBounds = new Rect();
+        Rect totalRect = new Rect(squareMargin, squareMargin, maxW - squareMargin, totalTimeSpendHeight);
 
         // draw total time
-        canvas.drawRect(squareMargin, squareMargin, maxW - squareMargin, totalTimeSpendHeight, hoursPaint);
-        canvas.drawText(text, squareMargin * 2, (totalTimeSpendHeight - (squareMargin + rect.height()) / 2), gridPaint);
+        canvas.drawRect(totalRect, hoursPaint);
+        if (period != null) {
+            String text = "TOTAL HOURS WORKED " + period.getHours() + ":" + period.getMinutes() + " of " + (workedDaysCount * 8);
+            gridPaint.getTextBounds(text, 0, text.length() - 1, textBounds);
+            int size = totalRect.width();
+            int totalNeedHoursWorks = workedDaysCount * 8;
+            int oneHourInPixels = size / totalNeedHoursWorks;
+            oneHourInPixels *= period.getHours();
+            canvas.drawRect(squareMargin, squareMargin, maxW - squareMargin - (size - oneHourInPixels), totalTimeSpendHeight, gridPaint);
+            canvas.drawText(text, squareMargin * 2, (totalTimeSpendHeight - (squareMargin + textBounds.height()) / 2), textPaint);
+        }
 
         // draw detail info
         Rect currInfoRect = new Rect();
@@ -165,15 +158,15 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
             canvas.drawRect(currInfoRect, hoursPaint);
             if (i == 1) {
                 String time = workedDaysCount + "/5";
-                gridPaint.getTextBounds(time, 0, time.length() - 1, rect);
+                gridPaint.getTextBounds(time, 0, time.length() - 1, textBounds);
                 float textSize = textSizeInPixels(time, gridPaint);
-                canvas.drawText(time, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (rect.height() / 2), gridPaint);
+                canvas.drawText(time, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), gridPaint);
             }
-            if (i == 0) {
-                String timeText = TimeCounter.getShortDateFromLong(workedHoursInCurrentTime);
-                gridPaint.getTextBounds(timeText, 0, timeText.length() - 1, rect);
+            if (i == 0 && period != null) {
+                String timeText = TimeCounter.getAverage(period.getHours() * 60 + period.getMinutes(), workedDaysCount);
+                gridPaint.getTextBounds(timeText, 0, timeText.length() - 1, textBounds);
                 float textSize = textSizeInPixels(timeText, gridPaint);
-                canvas.drawText(timeText, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (rect.height() / 2), gridPaint);
+                canvas.drawText(timeText, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), gridPaint);
             }
             left = left + average + separator;
             right = left + average;
@@ -251,6 +244,10 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         hoursPaint.setStrokeWidth(3);
         hoursPaint.setTextSize(25);
         hoursPaint.setAntiAlias(true);
+
+        textPaint = new Paint();
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(36);
     }
 
     private void initFromResource() {

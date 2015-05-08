@@ -1,8 +1,28 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.CompactMenu">
         <!-- Customize your theme here. -->
+        <!--<item name="searchViewStyle">@style/MySearchViewStyle</item>-->
     </style>
+
+    <!--<style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">-->
+    <!--&lt;!&ndash; Background for the search query section (e.g. EditText) &ndash;&gt;-->
+    <!--<item name="queryBackground">@color/abc_background_cache_hint_selector_material_dark</item>-->
+    <!--&lt;!&ndash; Background for the actions section (e.g. voice, submit) &ndash;&gt;-->
+    <!--<item name="submitBackground">...</item>-->
+    <!--&lt;!&ndash; Close button icon &ndash;&gt;-->
+    <!--<item name="closeIcon">...</item>-->
+    <!--&lt;!&ndash; Search button icon &ndash;&gt;-->
+    <!--<item name="searchIcon">...</item>-->
+    <!--&lt;!&ndash; Go/commit button icon &ndash;&gt;-->
+    <!--<item name="goIcon"></item>-->
+    <!--&lt;!&ndash; Voice search button icon &ndash;&gt;-->
+    <!--<item name="voiceIcon">...</item>-->
+    <!--&lt;!&ndash; Commit icon shown in the query suggestion row &ndash;&gt;-->
+    <!--<item name="commitIcon">...</item>-->
+    <!--&lt;!&ndash; Layout for query suggestion rows &ndash;&gt;-->
+    <!--<item name="suggestionRowLayout">...</item>-->
+    <!--</style>-->
 
 </resources>

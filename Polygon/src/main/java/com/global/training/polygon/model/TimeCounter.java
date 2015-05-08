@@ -38,6 +38,25 @@ public class TimeCounter {
         return day;
     }
 
+    public static String getAverage(int minutes, int days) {
+        int averageMinutes = minutes / days;
+        int fullHours = averageMinutes / 60;
+        double minutes2 = averageMinutes % 60;
+        minutes2 = minutes2 / 100 * 60;
+//        minutes2 = round(minutes2, 2);
+        int res = (int) minutes2;
+        return fullHours + "h " + res + "m";
+    }
+
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
     public static Date getShortDateFromString(String dateString) {
         Date date = null;
         try {
@@ -121,7 +140,6 @@ public class TimeCounter {
                     in = true;
                 }
 
-
                 if (out && in) {
                     long diff = (getDateFromString(timeStampOut).getTime() - getDateFromString(timeStampIn).getTime());
                     totalWorks += diff;
@@ -162,15 +180,15 @@ public class TimeCounter {
        return ""+ diffHours + ":" + diffMinutes;
     }
 
-//    public static long getHours(long time) {
-//        long diffHours = time / (60 * 60 * 1000);
-//        return diffHours;
-//    }
+    public static int getHoursFromMinutes(int min) {
+        int h = min / 60;
+        return h;
+    }
 
-//    public static long getMinutes(long time) {
-//        long diffMinutes = time / (60 * 1000) % 60;
-//        return diffMinutes;
-//    }
+    public static int getMinutesWithoutHours(int min) {
+        int m = min % 60;
+        return m;
+    }
 
     public static String convertToTimeRegular(long millis) {
         if (millis < 0) {
@@ -203,7 +221,7 @@ public class TimeCounter {
 
     public static void convertToFullWeek(List<RealWorksTime> mTimeSheetList) {
 
-        if (mTimeSheetList.size() < 5) {
+        if (mTimeSheetList != null && mTimeSheetList.size() < 5) {
             Calendar calendar = Calendar.getInstance();
 
             for (int day : days) {
