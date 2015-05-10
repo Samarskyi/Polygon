@@ -14,16 +14,18 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/refresh"
-        android:icon="@android:drawable/stat_notify_sync"
-        android:title="refresh"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/search"
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="100"
-        android:title="search"
+        android:title="@string/search"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+
+    <item
+        android:id="@+id/refresh"
+        android:orderInCategory="100"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:title="@string/refresh"
+        app:showAsAction="ifRoom" />
+
 </menu>

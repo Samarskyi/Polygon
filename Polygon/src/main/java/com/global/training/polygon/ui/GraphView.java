@@ -25,16 +25,11 @@ import java.util.List;
  */
 public class GraphView extends View implements ViewTreeObserver.OnPreDrawListener {
 
-    private int dayCount;
-    private int maxVisibleDayCount;
-
-    private int necessaryHourWork;
-    private int maxHourPerDay;
-
     private Paint gridPaint;
     private Paint hoursPaint;
     private Paint textPaint;
-    private Paint necessaryWorkedColorLine;
+    private Paint smallTextPaint;
+    private Paint timeGraphicPaint;
     private int separator;
     private int average;
     private int maxW;
@@ -42,20 +37,24 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     private int squareHeight;
     private int squareMargin;
     private int color;
-    private int graphMorgin;
-    private int graphMorginBott;
+    private int graphMargin;
+    private int graphMarginBott;
     private int spaceBetweenHourRectangle;
     private int paddingFirstHourGraph;
     private int totalTimeSpendHeight;
+    private int workedDaysCount = -1;
+
     private float shift;
     private float hourSeparator;
     private float hourInPixel;
     private float totalStartX;
-    private int workedDaysCount;
-    private long workedHoursInCurrentTime;
+
     private MutablePeriod period;
     private List<RealWorksTime> hoursWorked;
     private String[] dyaNames = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+    private Rect currInfoRect = new Rect();
+    private Rect totalRect = new Rect();
+    private Rect textBounds = new Rect();
 
     public GraphView(Context context) {
         super(context);
@@ -94,7 +93,6 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
             invalidate();
 
             workedDaysCount = 0;
-            workedHoursInCurrentTime = 0;
             boolean first = true;
 
             for (RealWorksTime realWorksTime : hoursWorked) {
@@ -135,9 +133,8 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
         int left = separator;
         int right = left + average;
-        Rect textBounds = new Rect();
-        Rect totalRect = new Rect(squareMargin, squareMargin, maxW - squareMargin, totalTimeSpendHeight);
 
+        totalRect.set(squareMargin, squareMargin, maxW - squareMargin, totalTimeSpendHeight);
         // draw total time
         canvas.drawRect(totalRect, hoursPaint);
         if (period != null) {
@@ -147,26 +144,31 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
             int totalNeedHoursWorks = workedDaysCount * 8;
             int oneHourInPixels = size / totalNeedHoursWorks;
             oneHourInPixels *= period.getHours();
-            canvas.drawRect(squareMargin, squareMargin, maxW - squareMargin - (size - oneHourInPixels), totalTimeSpendHeight, gridPaint);
+            canvas.drawRect(squareMargin, squareMargin, maxW - squareMargin - (size - oneHourInPixels), totalTimeSpendHeight, timeGraphicPaint);
             canvas.drawText(text, squareMargin * 2, (totalTimeSpendHeight - (squareMargin + textBounds.height()) / 2), textPaint);
         }
 
         // draw detail info
-        Rect currInfoRect = new Rect();
+
         for (int i = 0; i < 3; i++) {
             currInfoRect.set(left, squareMargin + totalTimeSpendHeight, right, squareHeight + totalTimeSpendHeight);
             canvas.drawRect(currInfoRect, hoursPaint);
-            if (i == 1) {
-                String time = workedDaysCount + "/5";
-                gridPaint.getTextBounds(time, 0, time.length() - 1, textBounds);
-                float textSize = textSizeInPixels(time, gridPaint);
-                canvas.drawText(time, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), gridPaint);
-            }
+
             if (i == 0 && period != null) {
                 String timeText = TimeCounter.getAverage(period.getHours() * 60 + period.getMinutes(), workedDaysCount);
                 gridPaint.getTextBounds(timeText, 0, timeText.length() - 1, textBounds);
                 float textSize = textSizeInPixels(timeText, gridPaint);
-                canvas.drawText(timeText, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), gridPaint);
+                canvas.drawText(timeText, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), textPaint);
+                textSize = textSizeInPixels("DAILY AVERAGE", smallTextPaint);
+                canvas.drawText("DAILY AVERAGE", currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height()) + 10, smallTextPaint);
+            } else if (i == 1 && workedDaysCount != -1) {
+                String time = workedDaysCount + "/5";
+                gridPaint.getTextBounds(time, 0, time.length() - 1, textBounds);
+                float textSize = textSizeInPixels(time, gridPaint);
+                canvas.drawText(time, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), textPaint);
+                String daysWorked = "DAYS WORKED";
+                textSize = textSizeInPixels(daysWorked, smallTextPaint);
+                canvas.drawText(daysWorked, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height()) +10 , smallTextPaint);
             }
             left = left + average + separator;
             right = left + average;
@@ -176,9 +178,9 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     private void drawSimpleGrid(Canvas canvas) {
         canvas.drawColor(color);
 
-        float startY = maxH - graphMorginBott;
-        int startX = squareMargin + graphMorgin;
-        int endX = maxW - squareMargin - graphMorgin;
+        float startY = maxH - graphMarginBott;
+        int startX = squareMargin + graphMargin;
+        int endX = maxW - squareMargin - graphMargin;
         int hour = 0;
 
         // draw time lines
@@ -197,9 +199,9 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     }
 
     private void drawGraphic(Canvas canvas) {
-        float startY = maxH - graphMorginBott;
+        float startY = maxH - graphMarginBott;
         float startX = totalStartX;
-        int endX = maxW - squareMargin - graphMorgin;
+        int endX = maxW - squareMargin - graphMargin;
         int totalSpaceForRectangles = (int) (endX - startX);
 
         int spaceForSingleRectangle = totalSpaceForRectangles / 5;
@@ -212,7 +214,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
                 float hours = Float.parseFloat((TimeCounter.convertToTimeRegular(hoursWorked.get(days).getTotalSpendTime())));
                 if (hours > -1) {
                     currentHours = hours * hourInPixel;
-                    canvas.drawRect(startX, startY - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, startY, hoursPaint);
+                    canvas.drawRect(startX, startY - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, startY, timeGraphicPaint);
                 }
                 startX += spaceForSingleRectangle;
             }
@@ -228,7 +230,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         }
     }
 
-    private float textSizeInPixels(String text, Paint paint){
+    private float textSizeInPixels(String text, Paint paint) {
         float size = paint.measureText(text);
         return size;
     }
@@ -248,14 +250,23 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(36);
+        textPaint.setAntiAlias(true);
+
+        smallTextPaint = new Paint();
+        smallTextPaint.setColor(Color.BLACK);
+        smallTextPaint.setTextSize(25);
+        smallTextPaint.setAntiAlias(true);
+
+        timeGraphicPaint = new Paint();
+        timeGraphicPaint.setColor(Color.GREEN);
     }
 
     private void initFromResource() {
         separator = (int) getResources().getDimension(R.dimen.separator);
         squareHeight = (int) getResources().getDimension(R.dimen.square_height);
         squareMargin = (int) getResources().getDimension(R.dimen.margin_square_time);
-        graphMorgin = (int) getResources().getDimension(R.dimen.graph_margin);
-        graphMorginBott = (int) getResources().getDimension(R.dimen.graph_margin_bottom);
+        graphMargin = (int) getResources().getDimension(R.dimen.graph_margin);
+        graphMarginBott = (int) getResources().getDimension(R.dimen.graph_margin_bottom);
         spaceBetweenHourRectangle = (int) getResources().getDimension(R.dimen.space_between_hour_rectangle);
         paddingFirstHourGraph = (int) getResources().getDimension(R.dimen.first_hours_graph_padding);
         totalTimeSpendHeight = (int) getResources().getDimension(R.dimen.total_time_height);
@@ -265,10 +276,10 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         maxH = getHeight();
         maxW = getWidth();
         average = (maxW - (separator * 4)) / 3;
-        shift = maxH - graphMorginBott - squareHeight - squareMargin * 2 - totalTimeSpendHeight;
+        shift = maxH - graphMarginBott - squareHeight - squareMargin * 2 - totalTimeSpendHeight;
         hourSeparator = shift / 6;
         hourInPixel = shift / 12;
-        totalStartX = squareMargin + graphMorgin + paddingFirstHourGraph;
+        totalStartX = squareMargin + graphMargin + paddingFirstHourGraph;
     }
 
     @Override

@@ -12,5 +12,7 @@
 	<string name="time_oracle_selected_time">Time</string>
 	<string name="time_oracle_selected_oracle">Oracle</string>
 	<string name="diff">Difference</string>
+	<string name="refresh">Refresh</string>
+	<string name="search">Search</string>
 
 </resources>
