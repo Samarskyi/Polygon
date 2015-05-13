@@ -14,6 +14,13 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/refresh"
+        android:orderInCategory="100"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:title="@string/refresh"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/search"
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="100"
@@ -21,11 +28,10 @@
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
 
-    <item
-        android:id="@+id/refresh"
-        android:orderInCategory="100"
-        android:icon="@android:drawable/stat_notify_sync"
-        android:title="@string/refresh"
-        app:showAsAction="ifRoom" />
-
+    <!--<item-->
+    <!--android:id="@+id/progress"-->
+    <!--android:orderInCategory="100"-->
+    <!--android:title="@string/refresh"-->
+    <!--app:actionLayout="@layout/m_progress"-->
+    <!--app:showAsAction="always" />-->
 </menu>
