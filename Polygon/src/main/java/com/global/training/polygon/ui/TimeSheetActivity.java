@@ -28,6 +28,7 @@ import java.util.List;
 
 public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTimeCallback, Api.EmployeesCallback {
 
+    private static final int FIRST_DAY = 1;
     private Calendar mCalendarStart;
     private Calendar mCalendarEnd;
 
@@ -47,13 +48,14 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.e("XXX", "onCreate");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         setContentView(R.layout.a_timesheet);
 
         graphView = (GraphView) findViewById(R.id.graph);
+
         Api.getUsers(this);
         mCalendarEnd = new GregorianCalendar();
 
@@ -85,17 +87,19 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.new_menu, menu);
+        Log.e("XXX", "onCreateOptionsMenu");
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
+        miActionProgressItem = menu.findItem(R.id.refresh);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
-        miActionProgressItem = menu.findItem(R.id.refresh);
-        miActionProgressItem.setActionView(R.layout.m_progress);
-
+        Log.e("XXX", "onPrepareOptionsMenu");
+        changeRefreshState(true);
         return super.onPrepareOptionsMenu(menu);
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -110,7 +114,9 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
             case R.id.refresh:
                 Log.d("XXX", "Refresh");
                 graphView.setHoursWorked(null);
-                getPreviousPeriod();
+                changeRefreshState(true);
+//                getPreviousPeriod();
+                getNextWeek();
                 return true;
             case R.id.search:
                 Log.d("XXX", "Search");
@@ -125,9 +131,18 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
     public void getTimeList(List<RealWorksTime> list) {
         Log.d("XXX", "getTimeList");
         graphView.setHoursWorked(list);
-        miActionProgressItem.setActionView(null);
+        changeRefreshState(false);
     }
 
+
+    private void changeRefreshState(boolean inProgress) {
+        if (inProgress) {
+            miActionProgressItem.setActionView(R.layout.m_progress);
+        } else {
+            miActionProgressItem.setActionView(null);
+        }
+
+    }
 
     private void getPreviousPeriod() {
         DateTime endDate = new DateTime(mCalendarEnd);
@@ -137,6 +152,20 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
             mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 1);
         }
         Api.timeWork(mCalendarStart.getTimeInMillis(), endDate.getMillis(), mUserId, this);
+    }
+
+    private void getNextWeek() {
+        DateTime endDate = new DateTime(mCalendarEnd);
+//        LocalDate localDate = new LocalDate(mCalendarEnd);
+
+        mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, getFirstDayOfWeek(endDate).getDayOfMonth());
+        Log.d("XXX", "period from:" + new DateTime(mCalendarStart.getTimeInMillis()));
+        Log.d("XXX", "period to  :" + new DateTime(endDate.getMillis()));
+        Api.timeWork(mCalendarStart.getTimeInMillis(), endDate.getMillis(), mUserId, this);
+    }
+
+    private DateTime getFirstDayOfWeek(DateTime other) {
+        return other.withDayOfWeek(FIRST_DAY);
     }
 
     @Override
@@ -164,6 +193,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
                 e.printStackTrace();
             }
         }
-        getPreviousPeriod();
+        getNextWeek();
+//        getPreviousPeriod();
     }
 }
