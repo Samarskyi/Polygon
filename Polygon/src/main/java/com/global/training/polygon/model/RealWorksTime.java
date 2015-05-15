@@ -15,7 +15,7 @@ public class RealWorksTime {
     public final static String ID_FIELD = "user_id";
     public final static String DATE_FIELD = "date";
     public final static String TOTAL_TIME_FIELD = "total_time";
-
+    public final static String TELEPORTS = "teleports";
     public RealWorksTime() {
     }
 
@@ -36,6 +36,8 @@ public class RealWorksTime {
     @DatabaseField(columnName = TOTAL_TIME_FIELD)
     private long totalSpendTime;
 
+    @DatabaseField(columnName = TELEPORTS)
+    private int teleport;
 
     public int getUser_id() {
         return user_id;
@@ -59,6 +61,14 @@ public class RealWorksTime {
 
     public void setTotalSpendTime(long totalSpendTime) {
         this.totalSpendTime = totalSpendTime;
+    }
+
+    public int getTeleport() {
+        return teleport;
+    }
+
+    public void setTeleport(int teleport) {
+        this.teleport = teleport;
     }
 
     @Override

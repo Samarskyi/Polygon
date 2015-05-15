@@ -79,7 +79,7 @@ public class Api {
 
     public static void getUsers(final EmployeesCallback employeesCallback) {
 
-        List<User> userList = DatabaseManager.getUsersFromDB();
+//        List<User> userList = DatabaseManager.getUsersFromDB();
 //        if (userList.size() != 0) {
 //            employeesCallback.getUserList(userList);
 //            return;
@@ -149,9 +149,12 @@ public class Api {
             @Override
             public void success(List<WorksTime> worksTimeList, Response response) {
                 Log.d(TAG, "parse xml success" + worksTimeList);
+                for(WorksTime worksTime : worksTimeList){
+                    Log.d("parse xml info", worksTime.toString());
+                }
                 List<RealWorksTime> timeSheetList = TimeCounter.getRealTime(worksTimeList, userId);
-
                 Log.d(TAG, "realTimeSheet size: " + timeSheetList.size());
+
                 officeTimeCallback.getTimeList(timeSheetList);
                 DatabaseManager.saveTimeSheetToDB(timeSheetList);
             }

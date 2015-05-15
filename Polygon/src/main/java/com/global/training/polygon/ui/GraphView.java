@@ -43,7 +43,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
     private int paddingFirstHourGraph;
     private int totalTimeSpendHeight;
     private int workedDaysCount = -1;
-
+    private int teleports;
     private float shift;
     private float hourSeparator;
     private float hourInPixel;
@@ -98,6 +98,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
             for (RealWorksTime realWorksTime : hoursWorked) {
                 if (realWorksTime.getTotalSpendTime() > 0) {
                     workedDaysCount++;
+                    teleports += realWorksTime.getTeleport();
                     if (first) {
                         first = false;
 
@@ -168,7 +169,15 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
                 canvas.drawText(time, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), textPaint);
                 String daysWorked = "DAYS WORKED";
                 textSize = textSizeInPixels(daysWorked, smallTextPaint);
-                canvas.drawText(daysWorked, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height()) +10 , smallTextPaint);
+                canvas.drawText(daysWorked, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height()) + 10, smallTextPaint);
+            } else if (i == 2 && period != null) {
+                String teleportsValue = teleports + " ";
+                gridPaint.getTextBounds(teleportsValue, 0, teleportsValue.length() - 1, textBounds);
+                float textSize = textSizeInPixels(teleportsValue, gridPaint);
+                canvas.drawText(teleportsValue, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height() / 2), textPaint);
+                String teleportsText = "TELEPORTS";
+                textSize = textSizeInPixels(teleportsText, smallTextPaint);
+                canvas.drawText(teleportsText, currInfoRect.centerX() - (textSize / 2), currInfoRect.centerY() + (textBounds.height()) + 10, smallTextPaint);
             }
             left = left + average + separator;
             right = left + average;

@@ -141,7 +141,6 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         } else {
             miActionProgressItem.setActionView(null);
         }
-
     }
 
     private void getPreviousPeriod() {

@@ -126,29 +126,45 @@ public class TimeCounter {
             String timeStampIn = null;
             boolean out = false;
             boolean in = false;
-
+            String lastMove = "";
             long totalWorks = 0;
+            int teleports = 0;
 
-            for (int i = times.size() - 1; i >= 0; i--) {
+            for (int i = 0; i <= times.size() - 1 ; i++) {
                 WorksTime worksTime = times.get(i);
+                Log.d("XXX","Pasing real worked time: " + worksTime.getTimestamp());
 
                 if (worksTime.getDirection().equals("out")) {
                     timeStampOut = worksTime.getTimestamp();
                     out = true;
+
                 } else if (worksTime.getDirection().equals("in")) {
-                    timeStampIn = worksTime.getTimestamp();
+
                     in = true;
+
+                    if(lastMove.equals("in")){
+                        timeStampOut = worksTime.getTimestamp();
+                        out = true;
+                        teleports++;
+                    }else{
+                        timeStampIn = worksTime.getTimestamp();
+                        lastMove = "in";
+                    }
                 }
 
                 if (out && in) {
+                    Log.d("XXX", "Pasing real worked time, minus : " + getDateFromString(timeStampOut) +" - " +getDateFromString(timeStampIn));
                     long diff = (getDateFromString(timeStampOut).getTime() - getDateFromString(timeStampIn).getTime());
                     totalWorks += diff;
                     in = false;
                     out = false;
+                    lastMove = "";
                     String s = getWorkedTime(diff);
                 }
             }
+            Log.d("XXX", "total spend time per " + getHours(totalWorks) + ":"+ getMinutes(totalWorks));
             realWorksTime.setTotalSpendTime(totalWorks);
+            realWorksTime.setTeleport(teleports);
             realWorksTimeList.add(realWorksTime);
         }
 
