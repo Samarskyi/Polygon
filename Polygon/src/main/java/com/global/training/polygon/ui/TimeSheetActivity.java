@@ -9,9 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.global.training.polygon.R;
 import com.global.training.polygon.model.RealWorksTime;
@@ -20,6 +23,9 @@ import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -38,13 +44,18 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
 
     private GraphView graphView;
     private SearchView searchView;
-
+    private ImageButton mPreviousPeriodButton;
+    private ImageButton mNextPeriodButton;
     private String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private MenuItem miActionProgressItem;
+    private PervNextClickListener timeListener;
+    private DateTime currentDatePosition;
+    private TextView mPeriodTextView;
 
+    DateTimeFormatter dtf = DateTimeFormat.forPattern("dd/MM/yyyy");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,13 +73,21 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         mPlanetTitles = getResources().getStringArray(R.array.planets_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.drawable.drawer_shadow);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawable, R.string.close_drawable);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mPlanetTitles));
         // Set the list's click listener
 //        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        timeListener = new PervNextClickListener();
+        mPreviousPeriodButton = (ImageButton) findViewById(R.id.left_button);
+        mNextPeriodButton = (ImageButton) findViewById(R.id.right_button);
+
+        mPreviousPeriodButton.setOnClickListener(timeListener);
+
+        mPeriodTextView = (TextView) findViewById(R.id.period);
     }
 
 
@@ -155,7 +174,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
 
     private void getNextWeek() {
         DateTime endDate = new DateTime(mCalendarEnd);
-//        LocalDate localDate = new LocalDate(mCalendarEnd);
+        currentDatePosition = new DateTime(mCalendarEnd);
 
         mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, getFirstDayOfWeek(endDate).getDayOfMonth());
         Log.d("XXX", "period from:" + new DateTime(mCalendarStart.getTimeInMillis()));
@@ -163,8 +182,25 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         Api.timeWork(mCalendarStart.getTimeInMillis(), endDate.getMillis(), mUserId, this);
     }
 
+    private void getPreviousWeek() {
+        DateTime endDate = new DateTime(currentDatePosition);
+        mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, getFirstDayOfWeek(endDate).getDayOfMonth());
+        DateTime start = new DateTime(mCalendarStart);
+        currentDatePosition = new DateTime(start.minusWeeks(1));
+
+        Log.d("XXX", "prev period from:" + new DateTime(start.minusWeeks(1).getMillis()));
+        Log.d("XXX", "prev period to  :" + new DateTime(endDate.minusWeeks(1).withDayOfWeek(DateTimeConstants.FRIDAY)));
+
+        long startMill = start.minusWeeks(1).withDayOfWeek(DateTimeConstants.MONDAY).getMillis();
+        long endMill = endDate.minusWeeks(1).withHourOfDay(23).withMinuteOfHour(59).withDayOfWeek(DateTimeConstants.FRIDAY).getMillis();
+        mPeriodTextView.setText(dtf.print(startMill) + " - " + dtf.print(endMill));
+
+        Api.timeWork(startMill, endMill, mUserId, this);
+    }
+
+
     private DateTime getFirstDayOfWeek(DateTime other) {
-        return other.withDayOfWeek(FIRST_DAY);
+        return other.withDayOfWeek(DateTimeConstants.MONDAY);
     }
 
     @Override
@@ -194,5 +230,25 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         }
         getNextWeek();
 //        getPreviousPeriod();
+    }
+
+    class PervNextClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.left_button:
+                    //todo prev period
+                    Log.d("XXX", "Previous period");
+                    getPreviousWeek();
+                    break;
+                case R.id.right_button:
+                    //todo next period
+                    Log.d("XXX", "Next period");
+
+                    break;
+            }
+        }
+
     }
 }

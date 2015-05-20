@@ -39,12 +39,15 @@ public class TimeCounter {
     }
 
     public static String getAverage(int minutes, int days) {
-        int averageMinutes = minutes / days;
-        int fullHours = averageMinutes / 60;
-        double minutes2 = averageMinutes % 60;
-        minutes2 = minutes2 / 100 * 60;
-//        minutes2 = round(minutes2, 2);
-        int res = (int) minutes2;
+        int fullHours = 0;
+        int res = 0;
+        if (days > 0) {
+            int averageMinutes = minutes / days;
+            fullHours = averageMinutes / 60;
+            double minutes2 = averageMinutes % 60;
+            minutes2 = minutes2 / 100 * 60;
+            res = (int) minutes2;
+        }
         return fullHours + "h " + res + "m";
     }
 
@@ -201,6 +204,10 @@ public class TimeCounter {
         return h;
     }
 
+    public static int getMinutesFromSeconds(int sec) {
+        Log.d("XXX", "convert sec to min, src : " + sec + ", result : " + (sec / 60));
+        return sec / 60;
+    }
     public static int getMinutesWithoutHours(int min) {
         int m = min % 60;
         return m;
@@ -242,8 +249,8 @@ public class TimeCounter {
 
             for (int day : days) {
                 boolean needAdd = true;
-                for (RealWorksTime list : mTimeSheetList) {
-                    calendar.setTime(list.getDate());
+                for (RealWorksTime worksTime : mTimeSheetList) {
+                    calendar.setTime(worksTime.getDate());
                     int dayId = calendar.get(Calendar.DAY_OF_WEEK);
                     if (day == dayId) {
                         needAdd = false;

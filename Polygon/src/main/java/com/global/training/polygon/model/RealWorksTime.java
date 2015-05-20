@@ -3,6 +3,8 @@ package com.global.training.polygon.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.joda.time.DateTime;
+
 import java.util.Comparator;
 import java.util.Date;
 
@@ -86,9 +88,13 @@ public class RealWorksTime {
 
     public static class CustomComparator implements Comparator<RealWorksTime> {
 
+        DateTime first;
+        DateTime next;
         @Override
-        public int compare(RealWorksTime lhs, RealWorksTime rhs) {
-            return lhs.getDate().compareTo(rhs.getDate());
+        public int compare(RealWorksTime first, RealWorksTime next) {
+            this.first = new DateTime(first.getDate());
+            this.next = new DateTime(next.getDate());
+            return (this.first.getDayOfWeek() < this.next.getDayOfWeek()) ? -1 : 1;
         }
     }
 }

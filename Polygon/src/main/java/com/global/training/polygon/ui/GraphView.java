@@ -86,10 +86,20 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
     public void setHoursWorked(List<RealWorksTime> hours) {
         hoursWorked = hours;
+        teleports = 0;
         if (hoursWorked != null) {
 
+            Log.d("XXX", "Before converting to full week and sorting, size:" + hoursWorked.size());
+            for (RealWorksTime realWorksTime : hoursWorked) {
+                Log.d("XXX", "order : " + realWorksTime.getDate());
+            }
             TimeCounter.convertToFullWeek(hoursWorked);
             Collections.sort(hoursWorked, new RealWorksTime.CustomComparator());
+
+            Log.d("XXX", "After converting to full week and sorting, size:" + hoursWorked.size());
+            for (RealWorksTime realWorksTime : hoursWorked) {
+                Log.d("XXX", "order : " + realWorksTime.getDate());
+            }
             invalidate();
 
             workedDaysCount = 0;
@@ -109,16 +119,23 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
                     } else {
                         period.add(realWorksTime.getTotalSpendTime());
-                        Log.d("XXX", "ADD Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
+                        Log.d("XXX", "ADD Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
                     }
                 }
+            }
+            if (period != null && period.getSeconds() > 59) {
+                int seconds = period.getSeconds();
+                period.addMinutes(TimeCounter.getMinutesFromSeconds(seconds));
+                period.setSeconds(0);
+                Log.d("XXX", "Convert Sec to Min Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
             }
             if (period != null && period.getMinutes() > 59) {
                 int minutes = period.getMinutes();
                 period.addHours(TimeCounter.getHoursFromMinutes(minutes));
                 period.setMinutes(TimeCounter.getMinutesWithoutHours(minutes));
-                Log.d("XXX", "Result Joda - H: " + period.getHours() + ", M : " + period.getMinutes());
+                Log.d("XXX", "Convert Min to Hour Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
             }
+            Log.d("XXX", "Result Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
         }
     }
 
@@ -138,7 +155,7 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
         totalRect.set(squareMargin, squareMargin, maxW - squareMargin, totalTimeSpendHeight);
         // draw total time
         canvas.drawRect(totalRect, hoursPaint);
-        if (period != null) {
+        if (period != null && workedDaysCount > 0) {
             String text = "TOTAL HOURS WORKED " + period.getHours() + ":" + period.getMinutes() + " of " + (workedDaysCount * 8);
             gridPaint.getTextBounds(text, 0, text.length() - 1, textBounds);
             int size = totalRect.width();
@@ -215,16 +232,17 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
 
         int spaceForSingleRectangle = totalSpaceForRectangles / 5;
 
-        float currentHours;
+        float currentHours = 0;
 
         // draw time graphic (rectangles)
         if (hoursWorked != null) {
             for (int days = 0; days < hoursWorked.size(); days++) {
                 float hours = Float.parseFloat((TimeCounter.convertToTimeRegular(hoursWorked.get(days).getTotalSpendTime())));
-                if (hours > -1) {
-                    currentHours = hours * hourInPixel;
-                    canvas.drawRect(startX, startY - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, startY, timeGraphicPaint);
+                if (hours < 0) {
+                    hours = 0;
                 }
+                currentHours = hours * hourInPixel;
+                canvas.drawRect(startX, startY - currentHours, startX + spaceForSingleRectangle - spaceBetweenHourRectangle, startY, timeGraphicPaint);
                 startX += spaceForSingleRectangle;
             }
         }
