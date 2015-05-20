@@ -27,19 +27,12 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 
 public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTimeCallback, Api.EmployeesCallback {
 
-    private static final int FIRST_DAY = 1;
-    private Calendar mCalendarStart;
-    private Calendar mCalendarEnd;
-
     private int mUserId;
-
     private List<User> mUserList;
 
     private GraphView graphView;
@@ -55,11 +48,14 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
     private DateTime currentDatePosition;
     private TextView mPeriodTextView;
 
-    DateTimeFormatter dtf = DateTimeFormat.forPattern("dd/MM/yyyy");
+    private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd/MM/yyyy");
+
+    public TimeSheetActivity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("XXX", "onCreate");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -67,27 +63,26 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
 
         graphView = (GraphView) findViewById(R.id.graph);
 
-        Api.getUsers(this);
-        mCalendarEnd = new GregorianCalendar();
-
         mPlanetTitles = getResources().getStringArray(R.array.planets_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawable, R.string.close_drawable);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // Set the adapter for the list view
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mPlanetTitles));
-        // Set the list's click listener
 //        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         timeListener = new PervNextClickListener();
+
         mPreviousPeriodButton = (ImageButton) findViewById(R.id.left_button);
         mNextPeriodButton = (ImageButton) findViewById(R.id.right_button);
 
         mPreviousPeriodButton.setOnClickListener(timeListener);
+        mNextPeriodButton.setOnClickListener(timeListener);
 
         mPeriodTextView = (TextView) findViewById(R.id.period);
+
+        currentDatePosition = new DateTime();
+        Api.getUsers(this);
     }
 
 
@@ -134,8 +129,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
                 Log.d("XXX", "Refresh");
                 graphView.setHoursWorked(null);
                 changeRefreshState(true);
-//                getPreviousPeriod();
-                getNextWeek();
+                getCurrentWeek();
                 return true;
             case R.id.search:
                 Log.d("XXX", "Search");
@@ -162,45 +156,39 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         }
     }
 
-    private void getPreviousPeriod() {
-        DateTime endDate = new DateTime(mCalendarEnd);
-        if (endDate.getDayOfMonth() > 15) {
-            mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 16);
-        } else {
-            mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, 1);
-        }
-        Api.timeWork(mCalendarStart.getTimeInMillis(), endDate.getMillis(), mUserId, this);
-    }
-
-    private void getNextWeek() {
-        DateTime endDate = new DateTime(mCalendarEnd);
-        currentDatePosition = new DateTime(mCalendarEnd);
-
-        mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, getFirstDayOfWeek(endDate).getDayOfMonth());
-        Log.d("XXX", "period from:" + new DateTime(mCalendarStart.getTimeInMillis()));
-        Log.d("XXX", "period to  :" + new DateTime(endDate.getMillis()));
-        Api.timeWork(mCalendarStart.getTimeInMillis(), endDate.getMillis(), mUserId, this);
-    }
-
-    private void getPreviousWeek() {
+    private void getCurrentWeek() {
         DateTime endDate = new DateTime(currentDatePosition);
-        mCalendarStart = new GregorianCalendar(endDate.getYear(), endDate.getMonthOfYear() - 1, getFirstDayOfWeek(endDate).getDayOfMonth());
-        DateTime start = new DateTime(mCalendarStart);
-        currentDatePosition = new DateTime(start.minusWeeks(1));
+        DateTime startDate = new DateTime(endDate).withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
 
-        Log.d("XXX", "prev period from:" + new DateTime(start.minusWeeks(1).getMillis()));
-        Log.d("XXX", "prev period to  :" + new DateTime(endDate.minusWeeks(1).withDayOfWeek(DateTimeConstants.FRIDAY)));
+        Log.d("XXX", "period from:" + startDate.getMillis());
+        Log.d("XXX", "period to  :" + endDate.getMillis());
 
-        long startMill = start.minusWeeks(1).withDayOfWeek(DateTimeConstants.MONDAY).getMillis();
-        long endMill = endDate.minusWeeks(1).withHourOfDay(23).withMinuteOfHour(59).withDayOfWeek(DateTimeConstants.FRIDAY).getMillis();
-        mPeriodTextView.setText(dtf.print(startMill) + " - " + dtf.print(endMill));
-
-        Api.timeWork(startMill, endMill, mUserId, this);
+        Api.timeWork(startDate.getMillis(), endDate.getMillis(), mUserId, this);
     }
 
+    private void getWeekPeriod(Constants flag) {
+        DateTime endDate = new DateTime(currentDatePosition);
+        DateTime start = new DateTime(endDate);
+        long startMill = 0;
+        long endMill = 0;
 
-    private DateTime getFirstDayOfWeek(DateTime other) {
-        return other.withDayOfWeek(DateTimeConstants.MONDAY);
+        switch (flag) {
+            case NEXT:
+                startMill = start.plusWeeks(1).withHourOfDay(0).withMinuteOfHour(0).withDayOfWeek(DateTimeConstants.MONDAY).getMillis();
+                endMill = endDate.plusWeeks(1).withHourOfDay(23).withMinuteOfHour(59).withDayOfWeek(DateTimeConstants.FRIDAY).getMillis();
+                currentDatePosition = new DateTime(start.plusWeeks(1));
+                break;
+            case PREVIOUS:
+                startMill = start.minusWeeks(1).withHourOfDay(0).withMinuteOfHour(0).withDayOfWeek(DateTimeConstants.MONDAY).getMillis();
+                endMill = endDate.minusWeeks(1).withHourOfDay(23).withMinuteOfHour(59).withDayOfWeek(DateTimeConstants.FRIDAY).getMillis();
+                currentDatePosition = new DateTime(start.minusWeeks(1));
+                break;
+        }
+        Log.d("XXX", "prev period from:" + new DateTime(startMill));
+        Log.d("XXX", "prev period to  :" + new DateTime(endMill));
+
+        mPeriodTextView.setText(dtf.print(startMill) + " - " + dtf.print(endMill));
+        Api.timeWork(startMill, endMill, mUserId, this);
     }
 
     @Override
@@ -228,8 +216,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
                 e.printStackTrace();
             }
         }
-        getNextWeek();
-//        getPreviousPeriod();
+        getCurrentWeek();
     }
 
     class PervNextClickListener implements View.OnClickListener {
@@ -238,17 +225,19 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.left_button:
-                    //todo prev period
                     Log.d("XXX", "Previous period");
-                    getPreviousWeek();
+                    getWeekPeriod(Constants.PREVIOUS);
                     break;
                 case R.id.right_button:
-                    //todo next period
                     Log.d("XXX", "Next period");
-
+                    getWeekPeriod(Constants.NEXT);
                     break;
             }
         }
 
+    }
+
+    private enum Constants {
+        NEXT, PREVIOUS;
     }
 }
