@@ -124,6 +124,8 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
             case R.id.change_user:
                 return true;
             case R.id.logout:
+                Log.d("XXX", "Logout");
+                PreferencesUtils.logout();
                 return true;
             case R.id.refresh:
                 Log.d("XXX", "Refresh");

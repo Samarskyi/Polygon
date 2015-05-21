@@ -25,6 +25,15 @@ public class PreferencesUtils {
         mEditor.commit();
     }
 
+    public static void logout() {
+        try {
+            mEditor.putString("lastUser", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mEditor.commit();
+    }
+
     public static String getCredentials(){
         return mSharedPreferences.getString("lastUser", null);
     }

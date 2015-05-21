@@ -3,7 +3,6 @@ package com.global.training.polygon.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -12,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.global.training.polygon.App;
 import com.global.training.polygon.R;
 import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
@@ -23,6 +23,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 
 	private String mLogin;
 	private String mPassword;
+
+	private StubLoginCredentials stubLoginCredentials;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 		mLoginField.setNextFocusDownId(R.id.password);
 		mPasswordField.setOnEditorActionListener(new ImeActionListener());
 		loginButton.setOnClickListener(this);
-    }
+
+		stubLoginCredentials = new StubLoginCredentials();
+		mLoginField.setOnLongClickListener(stubLoginCredentials);
+		mPasswordField.setOnLongClickListener(stubLoginCredentials);
+	}
 
 	@Override
 	public void onClick(View v) {
@@ -46,14 +52,18 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 	}
 
 	@Override
-	public void isAuthentication(boolean what) {
-		if (what) {
+	public void isAuthentication(boolean success) {
+		if (success) {
 			openUserChooseActivity(mLogin, mPassword);
 		} else {
-			Toast.makeText(this, "Authentication failed", Toast.LENGTH_LONG).show();
-			mPasswordField.setText("");
-		}
-	}
+			LoginActivity.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(App.self(), "Authentication failed", Toast.LENGTH_LONG).show();
+					mPasswordField.setText("");
+				}
+			});
+		}	}
 
 	private void initiateAuth() {
 		mLogin = mLoginField.getText().toString();
@@ -64,11 +74,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 	private void openUserChooseActivity(String login, String password) {
 
 		//TODO stub
-		if (TextUtils.isEmpty(login)) {
-			PreferencesUtils.saveCredentials("eugenii.samarskyi", "[PA989898pa]!");
-		} else {
+//		if (TextUtils.isEmpty(login)) {
+//			PreferencesUtils.saveCredentials("eugenii.samarskyi", "[PA989898pa]!");
+//		} else {
 			PreferencesUtils.saveCredentials(login, password);
-        }
+//        }
 
 		Intent userChooserActivity = new Intent(this, TimeSheetActivity.class);
 		startActivity(userChooserActivity);
@@ -87,6 +97,21 @@ public class LoginActivity extends Activity implements View.OnClickListener, Api
 		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 			if (actionId == EditorInfo.IME_ACTION_DONE) {
 				initiateAuth();
+				return true;
+			}
+			return false;
+		}
+	}
+
+	private class StubLoginCredentials implements View.OnLongClickListener {
+
+		@Override
+		public boolean onLongClick(View v) {
+			if (v.getId() == R.id.login) {
+				mLoginField.setText("eugenii.samarskyi");
+				return true;
+			} else if (v.getId() == R.id.password) {
+				mPasswordField.setText("[PA989898pa]!");
 				return true;
 			}
 			return false;

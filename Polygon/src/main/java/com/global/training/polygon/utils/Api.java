@@ -1,6 +1,5 @@
 package com.global.training.polygon.utils;
 
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -56,12 +55,12 @@ public class Api {
                     HttpGet httpGet = new HttpGet(URL_EMPLOYEES);
 
                     //TODO login stub
-                    if (TextUtils.isEmpty(login)) {
-                        Log.d("XXX", "Login is empty! Use stub");
-                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[PA989898pa]!"), "UTF-8", false));
-                    } else {
+//                    if (TextUtils.isEmpty(login)) {
+//                        Log.d("XXX", "Login is empty! Use stub");
+//                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[PA989898pa]!"), "UTF-8", false));
+//                    } else {
                         httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(login, pass), "UTF-8", false));
-                    }
+//                    }
                     HttpResponse httpResponse = httpclient.execute(httpGet);
                     StatusLine statusLine = httpResponse.getStatusLine();
                     int statusCode = statusLine.getStatusCode();
