@@ -54,13 +54,7 @@ public class Api {
                     HttpClient httpclient = new DefaultHttpClient();
                     HttpGet httpGet = new HttpGet(URL_EMPLOYEES);
 
-                    //TODO login stub
-//                    if (TextUtils.isEmpty(login)) {
-//                        Log.d("XXX", "Login is empty! Use stub");
-//                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials("eugenii.samarskyi", "[PA989898pa]!"), "UTF-8", false));
-//                    } else {
-                        httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(login, pass), "UTF-8", false));
-//                    }
+                    httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(login, pass), "UTF-8", false));
                     HttpResponse httpResponse = httpclient.execute(httpGet);
                     StatusLine statusLine = httpResponse.getStatusLine();
                     int statusCode = statusLine.getStatusCode();

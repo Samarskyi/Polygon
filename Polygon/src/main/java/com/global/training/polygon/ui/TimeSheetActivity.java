@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.global.training.polygon.R;
 import com.global.training.polygon.model.RealWorksTime;
-import com.global.training.polygon.model.User;
 import com.global.training.polygon.utils.Api;
 import com.global.training.polygon.utils.PreferencesUtils;
 
@@ -30,11 +29,9 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.List;
 
 
-public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTimeCallback, Api.EmployeesCallback {
+public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTimeCallback {
 
     private int mUserId;
-    private List<User> mUserList;
-
     private GraphView graphView;
     private SearchView searchView;
     private ImageButton mPreviousPeriodButton;
@@ -49,9 +46,6 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
     private TextView mPeriodTextView;
 
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd/MM/yyyy");
-
-    public TimeSheetActivity() {
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +76,8 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         mPeriodTextView = (TextView) findViewById(R.id.period);
 
         currentDatePosition = new DateTime();
-        Api.getUsers(this);
+        mUserId = PreferencesUtils.getLastSeenUserId();
+        getCurrentWeek();
     }
 
 
@@ -114,7 +109,6 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         return super.onPrepareOptionsMenu(menu);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -123,21 +117,23 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         switch (item.getItemId()) {
             case R.id.change_user:
                 return true;
+
             case R.id.logout:
                 Log.d("XXX", "Logout");
                 PreferencesUtils.logout();
                 return true;
+
             case R.id.refresh:
                 Log.d("XXX", "Refresh");
                 graphView.setHoursWorked(null);
                 changeRefreshState(true);
                 getCurrentWeek();
                 return true;
+
             case R.id.search:
                 Log.d("XXX", "Search");
                 searchView.setIconified(false);
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -148,7 +144,6 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         graphView.setHoursWorked(list);
         changeRefreshState(false);
     }
-
 
     private void changeRefreshState(boolean inProgress) {
         if (inProgress) {
@@ -194,36 +189,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         Api.timeWork(startMill, endMill, mUserId, this);
     }
 
-    @Override
-    public void getUserList(List<User> list) {
-
-        mUserList = list;
-//		Log.d("XXX", "Size of original list = " + mUserListOriginal.size() + " , size of filtered list + " + mUserList.size());
-        String[] infoSplit = PreferencesUtils.getCredentials().split(" ");
-        Log.d("XXX", "Credentials: " + infoSplit[0]);
-        if (list == null) {
-            Log.e("XXX", "LIST IS EMPTY");
-            return;
-        }
-        if (list.size() == 0) {
-            Log.e("XXX", "LIST SIZE == 0");
-            return;
-        }
-        for (User currentUser : mUserList) {
-            try {
-//				Log.d("XXX", "iterate users: " + (currentUser.getFirst_name() + "." + currentUser.getLast_name()).toLowerCase());
-                if ((currentUser.getFirst_name() + "." + currentUser.getLast_name()).toLowerCase().contains(infoSplit[0])) {
-                    mUserId = currentUser.getUid();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        getCurrentWeek();
-    }
-
     class PervNextClickListener implements View.OnClickListener {
-
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -237,7 +203,6 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
                     break;
             }
         }
-
     }
 
     private enum Constants {

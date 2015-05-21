@@ -15,6 +15,7 @@
 			android:id="@+id/iv_logo_login"
 			android:layout_width="match_parent"
 			android:layout_height="130dp"
+            android:layout_gravity="center"
 			android:src="@drawable/gl_logo"/>
 	<EditText
 			android:id="@+id/login"
@@ -32,12 +33,13 @@
 			android:imeOptions="actionDone"/>
 
     <Button
-			android:id="@+id/login_btn"
+        android:id="@+id/login_btn"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="match_parent"
-			android:layout_height="50dp"
-			android:textSize="20sp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/login_button"
         android:background="@drawable/login_selector"
-			android:text="@string/login_button"/>
+        android:textSize="20sp" />
 
 </LinearLayout>
