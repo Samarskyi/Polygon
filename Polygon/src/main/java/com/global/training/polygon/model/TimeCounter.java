@@ -40,15 +40,13 @@ public class TimeCounter {
 
     public static String getAverage(int minutes, int days) {
         int fullHours = 0;
-        int res = 0;
+        double fullMinutes = 0;
         if (days > 0) {
-            int averageMinutes = minutes / days;
-            fullHours = averageMinutes / 60;
-            double minutes2 = averageMinutes % 60;
-            minutes2 = minutes2 / 100 * 60;
-            res = (int) minutes2;
+            double averageMinutes = minutes / days;
+            fullHours = (int) (averageMinutes / 60);
+            fullMinutes = averageMinutes % 60;
         }
-        return fullHours + "h " + res + "m";
+        return (int) fullHours + "h " + (int) fullMinutes + "m";
     }
 
     private static double round(double value, int places) {
@@ -156,7 +154,7 @@ public class TimeCounter {
                 }
 
                 if (out && in) {
-                    Log.d("XXX", "Pasing real worked time, minus : " + getDateFromString(timeStampOut) +" - " +getDateFromString(timeStampIn));
+                    Log.d("XXX", "Parsing real worked time, minus : " + getDateFromString(timeStampOut) + " - " + getDateFromString(timeStampIn));
                     long diff = (getDateFromString(timeStampOut).getTime() - getDateFromString(timeStampIn).getTime());
                     totalWorks += diff;
                     in = false;
@@ -191,21 +189,12 @@ public class TimeCounter {
         return   " "+calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
     }
 
-    private static String diff(long time){
-        long diff = time;
-        long diffSeconds = diff / 1000 % 60;
-        long diffMinutes = diff / (60 * 1000) % 60;
-        long diffHours = diff / (60 * 60 * 1000);
-       return ""+ diffHours + ":" + diffMinutes;
-    }
-
     public static int getHoursFromMinutes(int min) {
         int h = min / 60;
         return h;
     }
 
     public static int getMinutesFromSeconds(int sec) {
-        Log.d("XXX", "convert sec to min, src : " + sec + ", result : " + (sec / 60));
         return sec / 60;
     }
     public static int getMinutesWithoutHours(int min) {

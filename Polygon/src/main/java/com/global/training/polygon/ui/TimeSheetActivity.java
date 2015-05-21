@@ -164,6 +164,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         Log.d("XXX", "period to  :" + endDate.getMillis());
 
         Api.timeWork(startDate.getMillis(), endDate.getMillis(), mUserId, this);
+        mPeriodTextView.setText(dtf.print(startDate.getMillis()) + " - " + dtf.print(endDate.getMillis()));
     }
 
     private void getWeekPeriod(Constants flag) {
