@@ -4,51 +4,85 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
-import android.widget.Filter;
-import android.widget.Filterable;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.global.training.polygon.R;
+import com.global.training.polygon.db.DatabaseManager;
 import com.global.training.polygon.model.User;
-import com.global.training.polygon.utils.Api;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
 
-public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener, Api.EmployeesCallback {
+public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener {
 
 	private List<User> mUserList;
 	private List<User> mUserListOriginal;
+	private ListView mListView;
+	private EditText editText;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_user_choose);
 
-		Api.getUsers(this);
-
-		AutoCompleteTextView autoTextView = (AutoCompleteTextView)findViewById(R.id.user_search_field);
-		autoTextView.setAdapter(new Adapter());
-		autoTextView.setThreshold(1);
-		autoTextView.setOnItemClickListener(this);
+		initListView();
+		initSearchView();
 
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
 	}
 
-	@Override
-	public void getUserList(List<User> list) {
-		mUserList = list;
-		mUserListOriginal = new ArrayList<User>(mUserList);
-		Log.d("XXX", "Size of original list = " + mUserListOriginal.size() + " , size of filtered list + " + mUserList.size());
+	private void initSearchView() {
+		editText = (EditText) findViewById(R.id.user_search_field);
+		editText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				String textSearch = s.toString();
+				try {
+					List<User> newUsers = DatabaseManager.getByFieldValueLike(
+							false, User.LAST_NAME_FIELD, textSearch, User.FIRST_NAME_FIELD, textSearch, User.class);
+					if (newUsers != null) {
+						Adapter adapter = new Adapter(newUsers);
+						mListView.setAdapter(adapter);
+//						.notifyDataSetChanged();
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+			}
+		});
+	}
+
+	private void initListView() {
+		mListView = (ListView) findViewById(R.id.filtered_user_list);
+		try {
+			mUserList = DatabaseManager.getAll(User.class);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if (mUserList != null) {
+			mListView.setAdapter(new Adapter(mUserList));
+		}
 	}
 
 	@Override
@@ -61,16 +95,24 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 		Log.d("XXX", "UserId : " + mUserList.get(position).getUid() + ", name: " +  mUserList.get(position).toString());
 	}
 
-	private class Adapter extends BaseAdapter implements Filterable {
+	private class Adapter extends BaseAdapter {
+
+
+		List<User> currentList;
+
+		public Adapter(List<User> list) {
+			currentList = list;
+		}
+
 
 		@Override
 		public int getCount() {
-			return mUserList.size();
+			return currentList.size();
 		}
 
 		@Override
 		public User getItem(int position) {
-			return mUserList.get(position);
+			return currentList.get(position);
 		}
 
 		@Override
@@ -86,42 +128,10 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 				view = layoutInflater.inflate(android.R.layout.simple_list_item_1, null);
 			}
 			TextView nameSurname = (TextView) view.findViewById(android.R.id.text1);
-			nameSurname.setText(mUserList.get(position).toString());
+			nameSurname.setText(currentList.get(position).toString());
 			return view;
 		}
 
-		@Override
-		public Filter getFilter() {
-			return new Filter() {
-				@Override
-				protected FilterResults performFiltering(CharSequence constraint) {
-					FilterResults filterResults = new FilterResults();
-					if (constraint != null) {
-						List<User> filteredUsers = new ArrayList<User>();
-						for (User currentUser : mUserList) {
-							if ((currentUser.getFirst_name() + " " + currentUser.getLast_name()).toLowerCase().contains(constraint)) {
-								filteredUsers.add(currentUser);
-							}
-						}
-						filterResults.values = filteredUsers;
-						filterResults.count = filteredUsers.size();
-					} else {
-						filterResults.values = mUserListOriginal;
-						filterResults.count = mUserListOriginal.size();
-					}
-					return filterResults;
-				}
 
-				@Override
-				protected void publishResults(CharSequence contraint, FilterResults results) {
-					if (results != null && results.count > 0) {
-						mUserList = (ArrayList<User>) results.values;
-						notifyDataSetChanged();
-					} else {
-						notifyDataSetInvalidated();
-					}
-				}
-			};
-		}
 	}
 }

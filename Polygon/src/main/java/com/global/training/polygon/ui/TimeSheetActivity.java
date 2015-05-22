@@ -1,5 +1,6 @@
 package com.global.training.polygon.ui;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -132,7 +133,8 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
 
             case R.id.search:
                 Log.d("XXX", "Search");
-                searchView.setIconified(false);
+                startActivity(new Intent(this, UserChooseActivity.class));
+//                searchView.setIconified(false);
                 return true;
         }
         return super.onOptionsItemSelected(item);

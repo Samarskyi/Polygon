@@ -1,17 +1,15 @@
 package com.global.training.polygon.db;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.global.training.polygon.App;
 import com.global.training.polygon.model.RealWorksTime;
-import com.global.training.polygon.model.User;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,140 +28,116 @@ public class DatabaseManager {
         mDatabaseHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
     }
 
+    public static void checkIfInited() {
+        if (mDatabaseHelper == null) {
+            initHelper(App.self());
+        }
+    }
+
     public static synchronized void releaseHelper() {
         OpenHelperManager.releaseHelper();
         mDatabaseHelper = null;
     }
 
-    public static boolean checkForCompleteDays(RealWorksTime time){
-        boolean result = true;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(time.getDate().getTime());
+    public static <T> List<T> getAll(Class<T> clazz) throws SQLException {
+        checkIfInited();
 
-        if(calendar.get(Calendar.DAY_OF_MONTH) == Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
-            result = false;
-        }
-
-        return result;
+        Dao<T, ?> dao = mDatabaseHelper.getDao(clazz);
+        return dao.queryForAll();
     }
 
-    public static boolean checkForCompleteDays(List<RealWorksTime> time){
-        boolean result = true;
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(time.getDate().getTime());
-//
-//        if(calendar.get(Calendar.DAY_OF_MONTH) == Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
-//            result = false;
-//        }
+    public static <T> T createOrUpdate(T ob) throws SQLException {
+        checkIfInited();
 
-        return result;
+        Dao<Object, ?> dao = (Dao<Object, ?>) mDatabaseHelper.getDao(ob.getClass());
+        return (T) dao.createOrUpdate(ob);
     }
 
-    public static void saveTimeSheetToDB(final List<RealWorksTime> list){
-        if (mDatabaseHelper == null) {
-            initHelper(App.self());
-        }
+    public static <T> int update(T ob) throws SQLException {
+        checkIfInited();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                Dao timeSheetDao = null;
-                try {
-                    timeSheetDao = mDatabaseHelper.getTimeSheetDao();
-                    for(RealWorksTime time : list){
-                        if(checkForCompleteDays(time)){
-                            timeSheetDao.createIfNotExists(time);
-                        }
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                Log.d(TAG, "TimeSheet is saved");
-            }
-        });
-
-        thread.start();
+        Dao<Object, ?> dao = (Dao<Object, ?>) mDatabaseHelper.getDao(ob.getClass());
+        return dao.update(ob);
     }
 
-    public static void saveUsersToDB(final List<User> list) {
-        if (mDatabaseHelper == null) {
-            initHelper(App.self());
-        }
+    public static <T> int delete(T ob) throws SQLException {
+        checkIfInited();
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                Dao userDao = null;
-                try {
-                    userDao = mDatabaseHelper.getUserDao();
-                    if (userDao.queryForAll().size() == 0) {
-                        Log.d(TAG, "Before adding size of user table : " + userDao.queryForAll().size());
-                        for (User user : list) {
-                            userDao.create(user);
-                        }
-                        Log.d(TAG, "After adding size of user table : " + userDao.queryForAll().size());
-                    }
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
-
+        Dao<Object, ?> dao = (Dao<Object, ?>) mDatabaseHelper.getDao(ob.getClass());
+        return dao.delete(ob);
     }
-    public static List<User> getUsersFromDB(){
-        List<User> list = null;
-        try {
-        if (mDatabaseHelper == null) {
-            initHelper(App.self());
-        }
 
-             list = mDatabaseHelper.getUserDao().queryForAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-//        releaseHelper();
-//        if(list!= null && list.size() != 0){
-////            for(User user : list){
-////                Log.d(TAG, "User id: " + user.getUid() + ", user name: " + user.getFirst_name());
-////            }
-//        }
-        return list;
+    public static <T> T getById(Object aId, Class<T> clazz) throws SQLException {
+        checkIfInited();
+
+        Dao<T, Object> dao = mDatabaseHelper.getDao(clazz);
+        return dao.queryForId(aId);
+    }
+
+    public static <T> int deleteAll(Class<T> clazz) throws SQLException {
+        checkIfInited();
+
+        Dao<Object, ?> dao = (Dao<Object, ?>) mDatabaseHelper.getDao(clazz);
+        return dao.deleteBuilder().delete();
     }
 
 
     public static List<RealWorksTime> getTimeSheet(long from, long till, int userId) throws SQLException {
-
-        if (mDatabaseHelper == null) {
-            initHelper(App.self());
-        }
-
-//        Calendar fromCalendar = Calendar.getInstance();
-//        fromCalendar.setTimeInMillis(from);
-//        fromCalendar.set(Calendar.HOUR_OF_DAY, 0);
-//        fromCalendar.set(Calendar.SECOND, 0);
-//
-//        Calendar tillCalendar = Calendar.getInstance();
-//        tillCalendar.setTimeInMillis(till);
-//        tillCalendar.set(Calendar.HOUR_OF_DAY, 23);
-//        tillCalendar.set(Calendar.SECOND, 0);
-//
-//        Date fromDate = fromCalendar.getTime();
-//        Date toDate = tillCalendar.getTime();
-//        Log.d(TAG, "From : " + fromDate.toString() + ", to :" + toDate + " , id :" + userId );
-
-        Dao timeSheetDao = mDatabaseHelper.getTimeSheetDao();
-
-        List<RealWorksTime> list = (List<RealWorksTime>) timeSheetDao.queryBuilder()
-                .where()
-                .between(RealWorksTime.DATE_FIELD, new Date(from), new Date(till))
-                .and()
-                .eq(RealWorksTime.ID_FIELD, userId).query();
-
+        checkIfInited();
+        List<RealWorksTime> list = null;
         return list;
     }
+
+    public static <T> List<T> getByFieldValueLike(boolean not, String column, Object value, String secondColumn, Object secondValue,
+                                                  Class<T> clazz) throws SQLException {
+        checkIfInited();
+
+        Dao<T, Object> dao = mDatabaseHelper.getDao(clazz);
+
+        QueryBuilder<T, Object> queryBuilder = dao.queryBuilder();
+        if (not) {
+            queryBuilder.where().not().like(column, "%" + value + "%");
+        } else {
+            queryBuilder.where().like(column, "%" + value + "%").or().like(secondColumn, "%" + secondValue + "%");
+        }
+        PreparedQuery<T> preparedQuery = queryBuilder.prepare();
+        List<T> result = dao.query(preparedQuery);
+
+        return result;
+    }
+
+    public static <T> List<T> getAllByFieldValue(String column, Object value, Class<T> clazz)
+            throws SQLException {
+        checkIfInited();
+
+        Dao<T, Object> dao = mDatabaseHelper.getDao(clazz);
+
+        QueryBuilder<T, Object> queryBuilder = dao.queryBuilder();
+        queryBuilder.where().eq(column, value);
+        PreparedQuery<T> preparedQuery = queryBuilder.prepare();
+        List<T> result = dao.query(preparedQuery);
+
+        if (result == null || result.size() == 0)
+            return null;
+        else
+            return result;
+    }
+
+    public static <T> List<T> getAllByFieldValueAnd(String column, Object value, String andColumn,
+                                                    Object andValue, Class<T> clazz) throws SQLException {
+        checkIfInited();
+
+        Dao<T, Object> dao = mDatabaseHelper.getDao(clazz);
+
+        QueryBuilder<T, Object> queryBuilder = dao.queryBuilder();
+        queryBuilder.where().eq(column, value).and().eq(andColumn, andValue);
+        PreparedQuery<T> preparedQuery = queryBuilder.prepare();
+        List<T> result = dao.query(preparedQuery);
+
+        if (result == null || result.size() == 0)
+            return null;
+        else
+            return result;
+    }
+
 }

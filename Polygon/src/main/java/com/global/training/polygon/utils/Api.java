@@ -4,7 +4,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.global.training.polygon.App;
-import com.global.training.polygon.db.DatabaseManager;
 import com.global.training.polygon.model.RealWorksTime;
 import com.global.training.polygon.model.TimeCounter;
 import com.global.training.polygon.model.User;
@@ -38,12 +37,6 @@ public class Api {
     private static final String URL_GLOBAL_LOGIC = "https://portal-ua.globallogic.com";
     private static final String URL_EMPLOYEES = "https://portal-ua.globallogic.com/officetime/json/employees.php";
     private static final String TAG = Api.class.getSimpleName();
-
-    private static Employees mEmployees;
-    private static OfficeTime officeTime;
-
-    private static Callback<List<User>> usersCallback;
-    private static Callback<List<WorksTime>> timeCallback;
 
     public static void auth(final String login, final String pass, final AuthCallback authCallback) {
 
@@ -80,24 +73,17 @@ public class Api {
 
         String userInfo = PreferencesUtils.getCredentials();
         String[] infoSplit = userInfo.split(" "); // 0 - login, 2 - password
-        ApiRequestInterceptor requestInterceptor = null;
-        if (infoSplit.length == 0) {
-            Log.d("XXX", "Login is empty! Use stub");
-            requestInterceptor = new ApiRequestInterceptor("eugenii.samarskyi", "[PA989898pa]!");
-        } else {
-            requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
-        }
+        ApiRequestInterceptor requestInterceptor = new ApiRequestInterceptor(infoSplit[0], infoSplit[1]);
 
         RestAdapter restAdapter = new RestAdapter.
                 Builder().setEndpoint(URL_EMPLOYEES).
                 setRequestInterceptor(requestInterceptor).build();
 
-        usersCallback = new Callback<List<User>>() {
+        Callback<List<User>> usersCallback = new Callback<List<User>>() {
 
             @Override
             public void success(List<User> users, Response response) {
                 employeesCallback.getUserList(users);
-                DatabaseManager.saveUsersToDB(users);
             }
 
             @Override
@@ -108,7 +94,7 @@ public class Api {
             }
         };
 
-        mEmployees = restAdapter.create(Employees.class);
+        EmployeesRequest mEmployees = restAdapter.create(EmployeesRequest.class);
         mEmployees.employeeList(usersCallback);
     }
 
@@ -138,18 +124,22 @@ public class Api {
                 setRequestInterceptor(requestInterceptor).
                 build();
 
-        timeCallback = new Callback<List<WorksTime>>() {
+        Callback<List<WorksTime>> timeCallback = new Callback<List<WorksTime>>() {
             @Override
             public void success(List<WorksTime> worksTimeList, Response response) {
                 Log.d(TAG, "parse xml success" + worksTimeList);
-                for(WorksTime worksTime : worksTimeList){
+                for (WorksTime worksTime : worksTimeList) {
                     Log.d("parse xml info", worksTime.toString());
                 }
                 List<RealWorksTime> timeSheetList = TimeCounter.getRealTime(worksTimeList, userId);
                 Log.d(TAG, "realTimeSheet size: " + timeSheetList.size());
 
                 officeTimeCallback.getTimeList(timeSheetList);
-                DatabaseManager.saveTimeSheetToDB(timeSheetList);
+//                try {
+//                    DatabaseManager.createOrUpdate(timeSheetList);
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
             }
 
             @Override
@@ -159,7 +149,7 @@ public class Api {
             }
         };
 
-        officeTime = restAdapter.create(OfficeTime.class);
+        OfficeTimeRequest officeTime = restAdapter.create(OfficeTimeRequest.class);
         officeTime.timeList(from, till, userId, "LWO", timeCallback);
     }
 
@@ -175,7 +165,7 @@ public class Api {
         public void getTimeList(List<RealWorksTime> list);
     }
 
-    interface OfficeTime {
+    interface OfficeTimeRequest {
         @GET("/officetime/json/events.php")
         void timeList(@Query("from") long from,
                       @Query("till") long till,
@@ -184,7 +174,7 @@ public class Api {
                       Callback<List<WorksTime>> time);
     }
 
-    interface Employees {
+    interface EmployeesRequest {
         @GET("/officetime/json/employees.php")
         void employeeList(Callback<List<User>> retrofitCallback);
     }

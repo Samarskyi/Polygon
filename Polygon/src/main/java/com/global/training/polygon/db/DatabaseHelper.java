@@ -7,7 +7,6 @@ import android.util.Log;
 import com.global.training.polygon.model.RealWorksTime;
 import com.global.training.polygon.model.User;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
@@ -20,9 +19,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "polygon.db";
     private static final int DATABASE_VERSION = 1;
-
-    private Dao userDao = null;
-    private Dao timeSheetDao = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,27 +37,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+        try {
+            TableUtils.dropTable(connectionSource, User.class, true);
+            TableUtils.createTable(connectionSource, User.class);
 
-    }
+            TableUtils.dropTable(connectionSource, RealWorksTime.class, true);
+            TableUtils.createTable(connectionSource, RealWorksTime.class);
 
-    public synchronized Dao getUserDao() throws SQLException{
-        if(userDao == null){
-            userDao =  getDao(User.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return userDao;
-    }
-
-    public synchronized Dao getTimeSheetDao() throws SQLException{
-        if(timeSheetDao == null){
-            timeSheetDao = getDao(RealWorksTime.class);
-        }
-        return timeSheetDao;
     }
 
     @Override
     public void close(){
         super.close();
-        userDao = null;
-        timeSheetDao = null;
     }
 }

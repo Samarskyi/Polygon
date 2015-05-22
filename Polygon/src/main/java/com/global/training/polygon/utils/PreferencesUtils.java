@@ -19,23 +19,12 @@ public class PreferencesUtils {
     private static SharedPreferences.Editor mEditor = mSharedPreferences.edit();
 
     public static void saveCredentials(String login, String pass){
-
         String loginPassForDecrypt = login + " " + pass;
-        try {
-            mEditor.putString(LAST_USER_CREDENTIAL, loginPassForDecrypt);
-            mEditor.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mEditor.putString(LAST_USER_CREDENTIAL, loginPassForDecrypt).commit();
     }
 
     public static void logout() {
-        try {
-            mEditor.putString(LAST_USER_CREDENTIAL, null);
-            mEditor.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mEditor.putString(LAST_USER_CREDENTIAL, null).commit();
     }
 
     public static String getCredentials(){
@@ -43,12 +32,7 @@ public class PreferencesUtils {
     }
 
     public static void saveLastSeenUserID(int id){
-        try {
-            mEditor.putInt(LAST_SEEN_USER_ID, id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        mEditor.commit();
+        mEditor.putInt(LAST_SEEN_USER_ID, id).commit();
     }
 
     public static int getLastSeenUserId() {

@@ -5,12 +5,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
 			  android:padding="8dp">
-	<AutoCompleteTextView
+
+	<EditText
 			android:id="@+id/user_search_field"
 			android:layout_width="match_parent"
 			android:layout_height="50dp"
 			android:hint="@string/username"
 			android:inputType="text"/>
+
 	<ListView
 			android:id="@+id/filtered_user_list"
 			android:layout_width="match_parent"

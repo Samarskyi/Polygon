@@ -21,8 +21,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.UserChooseActivity"
-	        android:theme="@android:style/Theme.Holo.NoActionBar">
+        <activity android:name=".ui.UserChooseActivity">
         </activity>
 
         <activity android:name=".ui.TimeSheetActivity" >
