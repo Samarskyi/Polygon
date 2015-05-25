@@ -45,6 +45,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
     private PervNextClickListener timeListener;
     private DateTime currentDatePosition;
     private TextView mPeriodTextView;
+    private TextView mNameTextView;
 
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("dd/MM/yyyy");
 
@@ -57,7 +58,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         setContentView(R.layout.a_timesheet);
 
         graphView = (GraphView) findViewById(R.id.graph);
-
+        mNameTextView = (TextView) findViewById(R.id.name);
         mPlanetTitles = getResources().getStringArray(R.array.planets_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open_drawable, R.string.close_drawable);
@@ -77,10 +78,17 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         mPeriodTextView = (TextView) findViewById(R.id.period);
 
         currentDatePosition = new DateTime();
-        mUserId = PreferencesUtils.getLastSeenUserId();
+        if (getIntent().getExtras() != null) {
+            Log.d("XXX", "savedInstanceState not null");
+            mUserId = getIntent().getIntExtra("userID", 0);
+            mNameTextView.setText(getIntent().getStringExtra("userName"));
+        } else {
+            mUserId = PreferencesUtils.getLastSeenUserId();
+            mNameTextView.setText(PreferencesUtils.getCredentials());
+        }
+        Log.d("XXX", "UserId, TimeSheet : " + mUserId);
         getCurrentWeek();
     }
-
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -110,6 +118,7 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
         return super.onPrepareOptionsMenu(menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -133,8 +142,8 @@ public class TimeSheetActivity extends AppCompatActivity implements Api.OfficeTi
 
             case R.id.search:
                 Log.d("XXX", "Search");
-                startActivity(new Intent(this, UserChooseActivity.class));
-//                searchView.setIconified(false);
+                Intent intent = new Intent(this, UserChooseActivity.class);
+                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

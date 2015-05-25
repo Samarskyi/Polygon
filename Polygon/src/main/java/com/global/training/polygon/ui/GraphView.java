@@ -135,7 +135,11 @@ public class GraphView extends View implements ViewTreeObserver.OnPreDrawListene
                 period.setMinutes(TimeCounter.getMinutesWithoutHours(minutes));
                 Log.d("XXX", "Convert Min to Hour Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
             }
-            Log.d("XXX", "Result Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
+            try {
+                Log.d("XXX", "Result Joda - H: " + period.getHours() + ", M : " + period.getMinutes() + ", S : " + period.getSeconds());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

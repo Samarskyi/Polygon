@@ -22,7 +22,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:gravity="right"
-                android:text="Samarskyi Eugenii"
                 android:textSize="18dp" />
 
             <LinearLayout

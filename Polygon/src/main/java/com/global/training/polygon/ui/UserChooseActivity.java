@@ -28,7 +28,6 @@ import java.util.List;
 public class UserChooseActivity extends Activity implements AdapterView.OnItemClickListener {
 
 	private List<User> mUserList;
-	private List<User> mUserListOriginal;
 	private ListView mListView;
 	private EditText editText;
 
@@ -60,7 +59,6 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 					if (newUsers != null) {
 						Adapter adapter = new Adapter(newUsers);
 						mListView.setAdapter(adapter);
-//						.notifyDataSetChanged();
 					}
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -81,29 +79,31 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 			e.printStackTrace();
 		}
 		if (mUserList != null) {
+			Log.d("XXX", "Add adapter and click listener");
 			mListView.setAdapter(new Adapter(mUserList));
+			mListView.setOnItemClickListener(this);
 		}
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Intent intent = new Intent(UserChooseActivity.this, TimeSheetActivity.class);
-		intent.putExtra("userID", mUserList.get(position).getUid());
-		intent.putExtra("userName", mUserList.get(position).toString());
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		User user = (User) view.getTag();
+		intent.putExtra("userID", user.getUid());
+		intent.putExtra("userName", user.toString());
 		startActivity(intent);
-
-		Log.d("XXX", "UserId : " + mUserList.get(position).getUid() + ", name: " +  mUserList.get(position).toString());
+		finish();
+		Log.d("XXX", "Click on item, UserId : " + (Integer) view.getTag(1) + ", name: " + (String) view.getTag(2));
 	}
 
 	private class Adapter extends BaseAdapter {
-
 
 		List<User> currentList;
 
 		public Adapter(List<User> list) {
 			currentList = list;
 		}
-
 
 		@Override
 		public int getCount() {
@@ -125,13 +125,16 @@ public class UserChooseActivity extends Activity implements AdapterView.OnItemCl
 			View view = convertView;
 			if (view == null) {
 				LayoutInflater layoutInflater = (LayoutInflater) UserChooseActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = layoutInflater.inflate(android.R.layout.simple_list_item_1, null);
+				view = layoutInflater.inflate(android.R.layout.simple_list_item_2, null);
 			}
 			TextView nameSurname = (TextView) view.findViewById(android.R.id.text1);
 			nameSurname.setText(currentList.get(position).toString());
+
+			TextView nameSurname2 = (TextView) view.findViewById(android.R.id.text2);
+			nameSurname2.setText(currentList.get(position).getZone());
+			view.setTag(currentList.get(position));
 			return view;
 		}
-
 
 	}
 }
